@@ -12,7 +12,7 @@ enum LOAD_ERR {
 	ELF_NOT_MAGIC,
 	ELF_NOT_VERSION,
 	ELF_NOT_FVERSION,
-	ELF_NOT_32BIT,
+	ELF_NOT_64BIT,
 	ELF_NOT_LITTLE,
 	ELF_SEGMENT_ALLOCFAIL,
 	ELF_SEGMENT_MEMTOOSMALL,
@@ -24,7 +24,7 @@ static const char elfmag[] = {ELFMAG0, ELFMAG1, ELFMAG2, ELFMAG3};
 
 static int elfparse(FILE *file, struct proc *proc)
 	__attribute__((nonnull, cold));
-static int loadseg(FILE *fp, Elf32_Phdr elfph, struct proc *proc)
+static int loadseg(FILE *fp, Elf64_Phdr elfph, struct proc *proc)
 	__attribute__((nonnull, cold));
 static void loaderr(const char *path, enum LOAD_ERR e)
 	__attribute__((nonnull, cold));
@@ -65,8 +65,8 @@ void freeproc(struct proc *proc)
 
 static int elfparse(FILE *file, struct proc *proc)
 {
-	Elf32_Ehdr elfh;
-	Elf32_Phdr elfph;
+	Elf64_Ehdr elfh;
+	Elf64_Phdr elfph;
 	enum LOAD_ERR err;
 
 	if (fread(&elfh, sizeof(elfh), 1, file) != 1)
@@ -75,8 +75,8 @@ static int elfparse(FILE *file, struct proc *proc)
 	// Checking if ELF file is correct
 	if (memcmp(elfh.e_ident, elfmag, sizeof(elfmag)) != 0)
 		return ELF_NOT_MAGIC;
-	else if (elfh.e_ident[EI_CLASS] != ELFCLASS32)
-		return ELF_NOT_32BIT;
+	else if (elfh.e_ident[EI_CLASS] != ELFCLASS64)
+		return ELF_NOT_64BIT;
 	else if (elfh.e_ident[EI_DATA] != ELFDATA2LSB)
 		return ELF_NOT_LITTLE;
 	else if (elfh.e_ident[EI_VERSION] == EV_NONE)
@@ -92,8 +92,8 @@ static int elfparse(FILE *file, struct proc *proc)
 		return ELF_NOT_FVERSION;
 
 	for (uint16_t i = 0; i < elfh.e_phnum; ++i) {
-		if (fseek(file, elfh.e_phoff + (i * elfh.e_phentsize),
-		   SEEK_SET) != 0)
+		if (fseek(file, (long int)(elfh.e_phoff +
+		   (Elf64_Off)(i * elfh.e_phentsize)), SEEK_SET) != 0)
 			return ELF_SEGMENT_CANTOFFSET;
 		if (fread(&elfph, sizeof(elfph), 1, file) != 1)
 			return ELF_SEGMENT_CANTOFFSET;
@@ -105,7 +105,7 @@ static int elfparse(FILE *file, struct proc *proc)
 	return 0;
 }
 
-static int loadseg(FILE *fp, Elf32_Phdr elfph, struct proc *proc)
+static int loadseg(FILE *fp, Elf64_Phdr elfph, struct proc *proc)
 {
 	struct memseg *seg;
 	uint8_t flags = 0;
@@ -126,7 +126,7 @@ static int loadseg(FILE *fp, Elf32_Phdr elfph, struct proc *proc)
 		return ELF_SEGMENT_MEMTOOSMALL;
 	}
 
-	if (fseek(fp, elfph.p_offset, SEEK_SET) == -1) {
+	if (fseek(fp, (long int)elfph.p_offset, SEEK_SET) == -1) {
 		freemem(&proc->mem);
 		return ELF_SEGMENT_CANTOFFSET;
 	}
@@ -158,8 +158,8 @@ static void loaderr(const char *path, enum LOAD_ERR e)
 	case ELF_NOT_MAGIC:
 		msg = "Can't find ELF magic numbers";
 		break;
-	case ELF_NOT_32BIT:
-		msg = "RISC-V ISA in use is not 32bit";
+	case ELF_NOT_64BIT:
+		msg = "RISC-V ISA in use is not 64bit";
 		break;
 	case ELF_NOT_LITTLE:
 		msg = "Cannot emulate non-little-endian code";

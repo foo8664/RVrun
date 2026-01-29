@@ -1,10 +1,10 @@
 #ifndef RISCV_H
 #define RISCV_H
 
+#define XLEN 64
+
 #include <stdint.h>
-typedef uint32_t reg_t;
-typedef uint32_t rvaddr_t;
+typedef uint64_t reg_t;
+typedef uint64_t rvaddr_t;
 
-/* TODO: define an xlen external variable */
-
-#endif /* RISCV_H */
+#endif // RISCV_H

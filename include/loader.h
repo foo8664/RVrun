@@ -4,16 +4,16 @@
 #include "riscv.h"
 #include "memory.h"
 
-/* Process structure */
+// Process structure
 struct proc {
-	reg_t regs[32]; /* reg[N] is register xN */
+	reg_t regs[32]; // reg[N] is register xN
 	reg_t pc;
 	struct memory mem;
 };
 
-/* Free's a process allocated by loadproc */
+// Free's a process allocated by loadproc
 void freeproc(struct proc *proc) __attribute__((nonnull, cold));
-/* Loades a process from an ELF file */
+// Loades a process from an ELF file
 struct proc *loadproc(const char *path)
 	__attribute__((nonnull, cold, malloc(freeproc, 1)));
 

@@ -12,7 +12,7 @@ enum memflags {
 			MEM_WRITE | MEM_EXEC)))
 #include "riscv.h"
 
-/* Memory segments, node of `mem`, flags field if memflags ORed together */
+// Memory segments, node of `mem`, flags field if memflags ORed together
 struct memseg {
 	struct memseg *next;
 	char *mem;
@@ -21,18 +21,18 @@ struct memseg {
 	uint8_t flags;
 };
 
-/* Memory structure, linked list of segments */
+// Memory structure, linked list of segments
 struct memory {
 	struct memseg *segments;
 };
 
-/* Adds a memory segment */
+// Adds a memory segment
 struct memseg *addseg(struct memory *mem, rvaddr_t start, rvaddr_t end,
 		      uint8_t flags) __attribute__((nonnull));
 
-/* Frees a memory segment */
+// Frees a memory segment
 void freeseg(struct memory *mem, struct memseg *seg) __attribute__((nonnull));
-/* Frees all of the memory */
+// Frees all of the memory
 void freemem(struct memory *mem);
 
 #endif /* MEMORY_H */
