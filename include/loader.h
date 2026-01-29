@@ -1,13 +1,14 @@
 #ifndef LOADER_H
 #define LOADER_H
 
-#include <stdint.h>
-typedef uint32_t reg_t;
+#include "riscv.h"
+#include "memory.h"
 
 /* Process structure */
 struct proc {
 	reg_t regs[32]; /* reg[N] is register xN */
 	reg_t pc;
+	struct memory mem;
 };
 
 /* Free's a process allocated by loadproc */
