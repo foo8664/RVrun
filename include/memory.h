@@ -32,7 +32,13 @@ struct memseg *addseg(struct memory *mem, rvaddr_t start, rvaddr_t end,
 
 // Frees a memory segment
 void freeseg(struct memory *mem, struct memseg *seg) __attribute__((nonnull));
+
 // Frees all of the memory
 void freemem(struct memory *mem);
+
+// Returns true if any pointer in the range start..end is already mapped
+#include <stdbool.h>
+bool is_memseg(struct memory mem, rvaddr_t start, rvaddr_t end)
+	__attribute__((nonnull));
 
 #endif /* MEMORY_H */

@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdbool.h>
 #include "riscv.h"
 #include "memory.h"
 
@@ -10,10 +11,10 @@ struct memseg *addseg(struct memory *mem, rvaddr_t start, rvaddr_t end,
 
 	if (MEMFLAG_INVALID(flags))
 		return NULL;
-
+	if (is_memseg(*mem, start, end))
+		return NULL;
 	if (!(seg = malloc(sizeof(*seg))))
 		return NULL;
-
 	if (!(seg->mem = malloc(end - start - 1))) {
 		free(seg);
 		return NULL;
@@ -70,4 +71,17 @@ void freemem(struct memory *mem)
 		freeseg(mem, seg);
 		seg = next;
 	}
+}
+
+bool is_memseg(struct memory mem, rvaddr_t start, rvaddr_t end)
+{
+	struct memseg *seg;
+
+	if (start > end)
+		return false;
+
+	for (seg = mem.segments; seg; seg = seg->next)
+		if (start >= seg->start && end <= seg->end)
+			return true;
+	return false;
 }

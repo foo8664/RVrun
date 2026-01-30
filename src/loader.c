@@ -1,7 +1,15 @@
+#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <assert.h>
+#include <stdbool.h>
+
+// For stack initialization, copy emulator's soft limit
+#include <sys/types.h>
+#include <sys/resource.h>
+
 #include <elf.h>
 #include "loader.h"
 
@@ -18,6 +26,8 @@ enum LOAD_ERR {
 	ELF_SEGMENT_MEMTOOSMALL,
 	ELF_SEGMENT_CANTOFFSET,
 	ELF_SEGMENT_CANTREAD,
+	PROC_CANNOT_QUERYSTACKSZ,
+	PROC_CANNOT_ALLOCSTACK,
 };
 
 static const char elfmag[] = {ELFMAG0, ELFMAG1, ELFMAG2, ELFMAG3};
@@ -26,7 +36,9 @@ static int elfparse(FILE *file, struct proc *proc)
 	__attribute__((nonnull, cold));
 static int loadseg(FILE *fp, Elf64_Phdr elfph, struct proc *proc)
 	__attribute__((nonnull, cold));
-static void loaderr(const char *path, enum LOAD_ERR e)
+static int loadstack(struct proc *proc)
+	__attribute__((nonnull, cold));
+static void loader_err(const char *path, enum LOAD_ERR e)
 	__attribute__((nonnull, cold));
 
 struct proc *loadproc(const char *path)
@@ -37,15 +49,18 @@ struct proc *loadproc(const char *path)
 
 	if (!(fp = fopen(path, "rb")))
 		goto err_out;
-	if (!(proc = malloc(sizeof(*proc))))
+	if (!(proc = calloc(1, sizeof(*proc))))
 		goto err_out;
-	proc->mem.segments = NULL;
 	if ((err = elfparse(fp, proc)) != 0) {
-		loaderr(path, err);
+		loader_err(path, err);
 		goto err_out;
 	}
 
-	memset(proc->regs, 0, sizeof(proc->regs));
+	if ((err = loadstack(proc)) != 0) {
+		loader_err(path, err);
+		goto err_out;
+	}
+
 	fclose(fp);
 	return proc;
 
@@ -138,7 +153,38 @@ static int loadseg(FILE *fp, Elf64_Phdr elfph, struct proc *proc)
 	return 0;
 }
 
-static void loaderr(const char *path, enum LOAD_ERR e)
+static int loadstack(struct proc *proc)
+{
+	struct rlimit slimit;
+	rvaddr_t start;
+
+	assert(sizeof(slimit.rlim_cur) <= sizeof(start));
+	assert(sizeof(random()) <= sizeof(start));
+
+	if (getrlimit(RLIMIT_STACK, &slimit) == -1) {
+		perror("loadstack(): getrlimit()");
+		return PROC_CANNOT_QUERYSTACKSZ;
+	}
+
+	if (slimit.rlim_cur == RLIM_INFINITY)
+		slimit.rlim_cur = 2 * (1024 * 1024); // 2Mb stack
+
+	srandom((unsigned)time(NULL));
+	do {
+		start = (rvaddr_t)random();
+		if (start + slimit.rlim_cur < start)
+			continue;
+	} while (is_memseg(proc->mem, start, start + slimit.rlim_cur + 1));
+
+	if (!addseg(&proc->mem, start, start + slimit.rlim_cur + 1,
+	   MEM_READ | MEM_WRITE))
+		return PROC_CANNOT_ALLOCSTACK;
+
+	proc->regs[REG_SP] = start + slimit.rlim_cur;
+	return 0;
+}
+
+static void loader_err(const char *path, enum LOAD_ERR e)
 {
 	char *msg = "";
 
@@ -178,6 +224,12 @@ static void loaderr(const char *path, enum LOAD_ERR e)
 		break;
 	case ELF_SEGMENT_MEMTOOSMALL:
 		msg = "Memory is too small for segment";
+		break;
+	case PROC_CANNOT_QUERYSTACKSZ:
+		msg = "Cannot query stack size";
+		break;
+	case PROC_CANNOT_ALLOCSTACK:
+		msg = "Cannot alocate stack for the process";
 		break;
 	default:
 		msg = "Unknown error";

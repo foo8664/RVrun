@@ -3,7 +3,7 @@ headers = include
 
 CC = gcc
 CFLAGS = -Wall -Werror -Wextra -Wconversion
-CFLAGS += -std=c99 -pedantic-errors
+CFLAGS += -std=c99 -pedantic-errors -D_GNU_SOURCE
 CFLAGS += -I$(headers)
 CFLAGS += -O2
 
