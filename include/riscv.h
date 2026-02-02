@@ -6,6 +6,7 @@
 #include <stdint.h>
 typedef uint64_t reg_t;
 typedef uint64_t rvaddr_t;
+typedef uint32_t insn_t;
 
 enum ABI_REG {
 	REG_ZERO=0,
