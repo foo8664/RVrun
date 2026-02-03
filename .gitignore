@@ -2,3 +2,4 @@ test.*
 *.o
 *.d
 rvrun
+include/opcodes.h

@@ -19,11 +19,13 @@ int main(void)
 	ret = insn_fetch(proc, &insn);
 	assert(ret == 4);
 	printf("insn 0x%.8x at addr 0x%lx\n", insn, proc->pc);
+	assert(insn_decode(insn));
 	proc->pc += (unsigned )ret;
 
 	ret = insn_fetch(proc, &insn);
 	assert(ret == 4);
 	printf("insn 0x%.8x at addr 0x%lx\n", insn, proc->pc);
+	assert(insn_decode(insn));
 	proc->pc += (unsigned)ret;
 
 	freeproc(proc);

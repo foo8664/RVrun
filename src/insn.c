@@ -8,7 +8,7 @@ int insn_fetch(struct proc *proc, insn_t *insn)
 {
 	struct memseg *seg;
 
-	seg = is_memseg(proc->mem, proc->pc, proc->pc + sizeof(insn) + 1);
+	seg = is_memseg(proc->mem, proc->pc, proc->pc + sizeof(*insn) + 1);
 	if (!seg) {
 		errno = EINVAL;
 		return -1;
@@ -23,4 +23,30 @@ int insn_fetch(struct proc *proc, insn_t *insn)
 		((insn_t)seg->mem[proc->pc - seg->start + 2] << 16) 	|
 		((insn_t)seg->mem[proc->pc - seg->start + 3] << 24));
 	return 4;
+}
+
+#define ADD_INSN(name, fname) if (IS_INSN(insn, name)) return (fname);
+int (*insn_decode(insn_t insn))(struct proc *, insn_t)
+{
+
+	ADD_INSN(ADD, insn_add);
+	ADD_INSN(AND, insn_and);
+
+	errno = ENOSYS;
+	return NULL;
+}
+#undef ADD_INSN
+
+int insn_add(struct proc *proc, insn_t insn)
+{
+	(void)proc;
+	(void)insn;
+	return 0;
+}
+
+int insn_and(struct proc *proc, insn_t insn)
+{
+	(void)proc;
+	(void)insn;
+	return 0;
 }
