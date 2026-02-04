@@ -10,6 +10,7 @@
 int main(void)
 {
 	struct proc *proc;
+	insn_func_t insn_func;
 	insn_t insn;
 	int ret;
 
@@ -19,14 +20,10 @@ int main(void)
 	ret = insn_fetch(proc, &insn);
 	assert(ret == 4);
 	printf("insn 0x%.8x at addr 0x%lx\n", insn, proc->pc);
-	assert(insn_decode(insn));
-	proc->pc += (unsigned )ret;
+	assert(insn_func = insn_decode(insn));
 
-	ret = insn_fetch(proc, &insn);
-	assert(ret == 4);
-	printf("insn 0x%.8x at addr 0x%lx\n", insn, proc->pc);
-	assert(insn_decode(insn));
-	proc->pc += (unsigned)ret;
+	assert(insn_func(proc, insn) == 0);
+	proc->pc += (unsigned )ret;
 
 	freeproc(proc);
 	return 0;

@@ -5,6 +5,8 @@
 
 #include <stdint.h>
 typedef uint64_t reg_t;
+typedef uint64_t ureg_t;
+typedef int64_t ireg_t;
 typedef uint64_t rvaddr_t;
 typedef uint32_t insn_t;
 

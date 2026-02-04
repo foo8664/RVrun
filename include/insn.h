@@ -2,7 +2,7 @@
 #define INSN_H
 
 #include "opcodes.h"
-#define IS_INSN(insn, name) (((insn) & MATCH_##name) == (MATCH_##name))
+#define IS_INSN(insn, name) (((insn) & MASK_##name) == (MATCH_##name))
 
 #include "riscv.h"
 #include "loader.h"
@@ -23,7 +23,17 @@ int (*insn_decode(insn_t insn))(struct proc *, insn_t);
  * These are the functions returned by insn_decode(), these currently don't do
  * anything, and are there just for testing.
  */
+typedef int (*insn_func_t)(struct proc *, insn_t);
 int insn_add(struct proc *proc, insn_t insn) __attribute__((nonnull));
+int insn_slt(struct proc *proc, insn_t insn) __attribute__((nonnull));
+int insn_sltu(struct proc *proc, insn_t insn) __attribute__((nonnull));
 int insn_and(struct proc *proc, insn_t insn) __attribute__((nonnull));
+int insn_or(struct proc *proc, insn_t insn) __attribute__((nonnull));
+int insn_xor(struct proc *proc, insn_t insn) __attribute__((nonnull));
+int insn_sll(struct proc *proc, insn_t insn) __attribute__((nonnull));
+int insn_srl(struct proc *proc, insn_t insn) __attribute__((nonnull));
+int insn_sra(struct proc *proc, insn_t insn) __attribute__((nonnull));
+int insn_sub(struct proc *proc, insn_t insn) __attribute__((nonnull));
+
 
 #endif // INSN_H
