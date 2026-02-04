@@ -7,12 +7,17 @@
 #include "loader.h"
 #include "insn.h"
 
+#include "debug.h"
+
 int main(void)
 {
 	struct proc *proc;
 	insn_func_t insn_func;
 	insn_t insn;
 	int ret;
+
+	warn_log("Test warning, %s", "Test arg");
+	panic("Testing panic");
 
 	if (!(proc = loadproc("test.elf")))
 		return 1;
