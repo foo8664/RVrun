@@ -5,7 +5,7 @@
 #define IS_INSN(insn, name) (((insn) & MASK_##name) == (MATCH_##name))
 
 #include "riscv.h"
-#include "loader.h"
+#include "proc.h"
 /*
  * fetches the next instruction from a process and returns it's size in bytes,
  * will return -1 and set errno if it fails, analogous to memload() but checks

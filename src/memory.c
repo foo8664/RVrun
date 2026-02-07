@@ -1,6 +1,7 @@
 #include <errno.h>
 #include <assert.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include "riscv.h"
 #include "memory.h"
 
