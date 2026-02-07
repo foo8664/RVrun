@@ -11,7 +11,8 @@
 #include <sys/resource.h>
 
 #include <elf.h>
-#include "loader.h"
+#include "proc.h"
+#include "debug.h"
 
 enum LOAD_ERR {
 	ELF_NOT_EXEC=1,
@@ -236,5 +237,5 @@ static void loader_err(const char *path, enum LOAD_ERR e)
 		break;
 	}
 
-	fprintf(stderr, "%s: %s\n", path, msg);
+	err_log("%s: %s\n", path, msg);
 }
