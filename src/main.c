@@ -11,6 +11,7 @@ int main(void)
 	insn_func_t insn_func;
 	insn_t insn;
 	int ret;
+	int i;
 
 	if (!(proc = loadproc("test.elf")))
 		return 1;
@@ -22,6 +23,9 @@ int main(void)
 
 	assert(insn_func(proc, insn) == 0);
 	proc->pc += (unsigned )ret;
+
+	for (i = 0; i < 32; ++i)
+		dbg_log("proc->x%d = %ld", i, (ireg_t)proc->regs[i]);
 
 	freeproc(proc);
 	return 0;

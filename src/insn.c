@@ -31,16 +31,22 @@ int insn_fetch(struct proc *proc, insn_t *insn)
 int (*insn_decode(insn_t insn))(struct proc *, insn_t)
 {
 
-	ADD_INSN(ADD, insn_add);
-	ADD_INSN(SLT, insn_slt);
-	ADD_INSN(SLTU, insn_sltu);
-	ADD_INSN(AND, insn_and);
-	ADD_INSN(OR, insn_or);
-	ADD_INSN(XOR, insn_xor);
-	ADD_INSN(SLL, insn_sll);
-	ADD_INSN(SRL, insn_srl);
-	ADD_INSN(SRA, insn_sra);
-	ADD_INSN(SUB, insn_sub);
+	ADD_INSN(ADD,	insn_add);
+	ADD_INSN(SLT,	insn_slt);
+	ADD_INSN(SLTU,	insn_sltu);
+	ADD_INSN(AND,	insn_and);
+	ADD_INSN(OR,	insn_or);
+	ADD_INSN(XOR,	insn_xor);
+	ADD_INSN(SLL,	insn_sll);
+	ADD_INSN(SRL,	insn_srl);
+	ADD_INSN(SRA,	insn_sra);
+	ADD_INSN(SUB,	insn_sub);
+	ADD_INSN(ANDI,	insn_andi);
+	ADD_INSN(ORI, 	insn_ori);
+	ADD_INSN(XORI,	insn_xori);
+	ADD_INSN(ADDI,	insn_addi);
+	ADD_INSN(SLTI,	insn_slti);
+	ADD_INSN(SLTIU,	insn_sltiu);
 
 	errno = ENOSYS;
 	return NULL;

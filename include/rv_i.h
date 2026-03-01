@@ -9,15 +9,26 @@
  * instruction with their name on the process `proc`. `insn` should be their
  * 32bit verbatim representation
  */
-int insn_add(struct proc *proc, insn_t insn) __attribute__((nonnull));
-int insn_slt(struct proc *proc, insn_t insn) __attribute__((nonnull));
-int insn_sltu(struct proc *proc, insn_t insn) __attribute__((nonnull));
-int insn_and(struct proc *proc, insn_t insn) __attribute__((nonnull));
-int insn_or(struct proc *proc, insn_t insn) __attribute__((nonnull));
-int insn_xor(struct proc *proc, insn_t insn) __attribute__((nonnull));
-int insn_sll(struct proc *proc, insn_t insn) __attribute__((nonnull));
-int insn_srl(struct proc *proc, insn_t insn) __attribute__((nonnull));
-int insn_sra(struct proc *proc, insn_t insn) __attribute__((nonnull));
-int insn_sub(struct proc *proc, insn_t insn) __attribute__((nonnull));
+
+// R-type instructions
+int insn_add(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_slt(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_sltu(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_and(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_or(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_xor(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_sll(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_srl(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_sra(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_sub(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+
+// I-type instructions
+int insn_andi(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_ori(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_xori(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_addi(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_slti(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_sltiu(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+
 
 #endif // RISCV_RV64I_H
