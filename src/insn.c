@@ -54,6 +54,7 @@ int (*insn_decode(insn_t insn))(struct proc *, insn_t)
 	ADD_INSN(ADDI,	insn_addi);
 	ADD_INSN(SLTI,	insn_slti);
 	ADD_INSN(SLTIU,	insn_sltiu);
+	ADD_INSN(ECALL, insn_ecall);
 
 	errno = ENOSYS;
 	return NULL;

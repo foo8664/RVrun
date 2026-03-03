@@ -12,6 +12,10 @@
 #include "debug.h"
 #include "rv_i.h"
 
+// For ecall
+#include "syscall.h"
+#include "sysnums.h"
+
 static inline void R_getfields(insn_t insn, enum ABI_REG *rd, enum ABI_REG *rs1,
 			       enum ABI_REG *rs2) __attribute__((nonnull));
 static inline void I_getfields(insn_t insn, enum ABI_REG *rd, enum ABI_REG *rs1,
@@ -237,4 +241,25 @@ int insn_sltiu(struct proc *proc, insn_t insn)
 	mvreg(proc, rd, (reg_t)((ureg_t)getreg(proc, rs1) < (ureg_t)imm));
 	dbg_log("sltiu: Setting x%d = x%d < %lu", rd, rs1, imm);
 	return 0;
+}
+
+// Ignores rd and rs1, only implements linux system calls
+int insn_ecall(struct proc *proc, insn_t insn)
+{
+	int sysnum;
+	(void)insn;
+
+	sysnum = (int)getreg(proc, REG_A7);
+
+	dbg_log("ecall: syscall %d", sysnum);
+
+#define ADD_SYSCALL(sc) case __NR_##sc: return rvsys_##sc(proc)
+	switch (sysnum) {
+		ADD_SYSCALL(exit);
+		ADD_SYSCALL(exit_group);
+	}
+#undef ADD_SYSCALL
+
+	errno = ENOSYS;
+	return -1;
 }

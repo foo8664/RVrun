@@ -11,11 +11,19 @@
 #include "riscv.h"
 #include "memory.h"
 
+#include <stdbool.h>
+struct exitinfo {
+	int status;
+	bool exited;
+};
+
 // Process structure
 struct proc {
 	reg_t regs[32]; // reg[N] is register xN
 	reg_t pc;
+
 	struct memory mem;
+	struct exitinfo exitinfo;
 };
 
 // Free's a process allocated by loadproc

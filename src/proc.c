@@ -45,6 +45,8 @@ struct proc *loadproc(const char *path)
 	if (loadstack(proc))
 		goto err_out;
 
+	proc->exitinfo.exited = false;
+
 	fclose(fp);
 	return proc;
 

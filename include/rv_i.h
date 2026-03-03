@@ -36,6 +36,7 @@ int insn_xori(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_addi(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_slti(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_sltiu(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_ecall(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 
 
 #endif // RISCV_RV64I_H
