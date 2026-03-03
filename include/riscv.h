@@ -1,3 +1,10 @@
+/* SPDX-License-Identifier: GPL-2.0-only */
+/*
+ * RISC-V constants and typedefs
+ *
+ *  Copyright (C) 2026 by Diego Oliveira Evaristo <di.diegoevaristo@gmail.com>
+ */
+
 #ifndef RISCV_H
 #define RISCV_H
 

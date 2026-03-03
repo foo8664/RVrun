@@ -1,3 +1,10 @@
+/* SPDX-License-Identifier: GPL-2.0-only */
+/*
+ * Functions for logging and debugging
+ *
+ *  Copyright (C) 2026 by Diego Oliveira Evaristo <di.diegoevaristo@gmail.com>
+ */
+
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>

@@ -1,3 +1,10 @@
+/* SPDX-License-Identifier: GPL-2.0-only */
+/*
+ * Process loading and simulating
+ *
+ *  Copyright (C) 2026 by Diego Oliveira Evaristo <di.diegoevaristo@gmail.com>
+ */
+
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>

@@ -1,3 +1,10 @@
+/* SPDX-License-Identifier: GPL-2.0-only */
+/*
+ * Main file, loads, executes, and exits
+ *
+ *  Copyright (C) 2026 by Diego Oliveira Evaristo <di.diegoevaristo@gmail.com>
+ */
+
 #include <assert.h>
 #include "riscv.h"
 #include "debug.h"

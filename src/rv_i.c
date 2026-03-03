@@ -1,3 +1,10 @@
+/* SPDX-License-Identifier: GPL-2.0-only */
+/*
+ * Rv64I instructions
+ *
+ *  Copyright (C) 2026 by Diego Oliveira Evaristo <di.diegoevaristo@gmail.com>
+ */
+
 #include <errno.h>
 #include <stdint.h>
 #include "riscv.h"
