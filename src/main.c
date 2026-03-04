@@ -5,35 +5,64 @@
  *  Copyright (C) 2026 by Diego Oliveira Evaristo <di.diegoevaristo@gmail.com>
  */
 
-#include <assert.h>
+#include <errno.h>
+#include <string.h>
 #include "riscv.h"
 #include "debug.h"
 #include "memory.h"
 #include "proc.h"
 #include "insn.h"
 
+// Von Neumann fetch-decode-exec cycle, returns non-zero at error
+int exec_cycle(struct proc *proc) __attribute__((nonnull, cold));
+
 int main(void)
 {
 	struct proc *proc;
-	insn_func_t insn_func;
-	insn_t insn;
 	int ret;
-	int i;
 
 	if (!(proc = loadproc("test.elf")))
 		return 1;
 
-	ret = insn_fetch(proc, &insn);
-	assert(ret == 4);
-	dbg_log("insn 0x%.8x at addr 0x%lx", insn, proc->pc);
-	assert(insn_func = insn_decode(insn));
-
-	assert(insn_func(proc, insn) == 0);
-	proc->pc += (unsigned )ret;
-
-	for (i = 0; i < 32; ++i)
-		dbg_log("proc->x%d = %ld", i, (ireg_t)proc->regs[i]);
+	ret = exec_cycle(proc);
+	if (ret != 0)
+		err_log("Interrupting fetch-decode-exec cycle");
+	else
+		ret = proc->exitinfo.status;
 
 	freeproc(proc);
+	return ret;
+}
+
+int exec_cycle(struct proc *proc)
+{
+	insn_func_t insn_func;
+	insn_t insn;
+	int pc_skip;
+
+	errno = 0;
+	while (!proc->exitinfo.exited) {
+		pc_skip = insn_fetch(proc, &insn);
+		if (pc_skip == -1) {
+			err_log("Can't fetch insn at 0x%lx: %s", proc->pc,
+				strerror(errno));
+			return 1;
+		}
+
+		insn_func = insn_decode(insn);
+		if (!insn_func) {
+			err_log("Can't decode 0x%x at pc 0x%lx", insn, proc->pc);
+			return 1;
+		}
+
+		if (insn_func(proc, insn) != 0) {
+			err_log("Can't execute insn 0x%x at pc 0x%lx: %s",
+				insn, proc->pc, strerror(errno));
+			return 1;
+		}
+
+		proc->pc += (rvaddr_t)pc_skip;
+	}
+
 	return 0;
 }
