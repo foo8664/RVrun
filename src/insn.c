@@ -37,7 +37,8 @@ int insn_fetch(struct proc *proc, insn_t *insn)
 #define ADD_INSN(name, fname) if (IS_INSN(insn, name)) return (fname)
 int (*insn_decode(insn_t insn))(struct proc *, insn_t)
 {
-
+	// Rv64I instructions
+	// R-type:
 	ADD_INSN(ADD,	insn_add);
 	ADD_INSN(SLT,	insn_slt);
 	ADD_INSN(SLTU,	insn_sltu);
@@ -48,13 +49,31 @@ int (*insn_decode(insn_t insn))(struct proc *, insn_t)
 	ADD_INSN(SRL,	insn_srl);
 	ADD_INSN(SRA,	insn_sra);
 	ADD_INSN(SUB,	insn_sub);
+	ADD_INSN(ADDW,	insn_addw);
+	ADD_INSN(SUBW,	insn_subw);
+	ADD_INSN(SLLW,	insn_sllw);
+	ADD_INSN(SRLW,	insn_srlw);
+	ADD_INSN(SRLW,	insn_srlw);
+
+	// I-type:
 	ADD_INSN(ANDI,	insn_andi);
 	ADD_INSN(ORI, 	insn_ori);
 	ADD_INSN(XORI,	insn_xori);
+	ADD_INSN(SLLI,	insn_slli);
+	ADD_INSN(SRLI,	insn_srli);
+	ADD_INSN(SRAI,	insn_srai);
 	ADD_INSN(ADDI,	insn_addi);
 	ADD_INSN(SLTI,	insn_slti);
 	ADD_INSN(SLTIU,	insn_sltiu);
 	ADD_INSN(ECALL, insn_ecall);
+	ADD_INSN(ADDIW,	insn_addiw);
+	ADD_INSN(SLLIW,	insn_slliw);
+	ADD_INSN(SRLIW,	insn_srliw);
+	ADD_INSN(SRAIW,	insn_sraiw);
+
+	// U-type:
+	ADD_INSN(LUI,	insn_lui);
+	ADD_INSN(AUIPC,	insn_auipc);
 
 	errno = ENOSYS;
 	return NULL;

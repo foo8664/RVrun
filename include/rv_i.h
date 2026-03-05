@@ -28,15 +28,30 @@ int insn_sll(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_srl(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_sra(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_sub(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_addw(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_subw(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_sllw(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_srlw(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_sraw(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 
 // I-type instructions
 int insn_andi(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_ori(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_xori(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_addi(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_slli(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_srli(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_srai(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_slti(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_sltiu(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_ecall(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_addiw(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_slliw(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_srliw(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_sraiw(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 
+// U-type instructions
+int insn_lui(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_auipc(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 
 #endif // RISCV_RV64I_H
