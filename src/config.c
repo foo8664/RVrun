@@ -176,6 +176,7 @@ static void help(struct rvconfig *cfg)
 	fputc('\n', stderr);
 	for (i = 0; i < cfg->size; ++i)
 		fprintf(stderr, "%s\n", cfg->opts[i].help);
+	fputs("\n\t--help: Displays this message and exits\n", stderr);
 	fputc('\n', stderr);
 
 	fputs(  "The exit code is passed by the emulated process, if RvRun\n"
