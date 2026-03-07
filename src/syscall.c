@@ -58,7 +58,7 @@ int rvsys_write(struct proc *proc)
 			proc->regs[REG_A1], n, MEM_READ, MEM_READ);
 
 	dbg_log("Emulating sys_write(%d (real fd %d), 0x%lx (real ptr %p), %zu)",
-		fd, (int)proc->regs[REG_A0], proc->regs[REG_A1], buff, n);
+		(int)proc->regs[REG_A0], fd, proc->regs[REG_A1], buff, n);
 	ret = syscall(SYS_write, fd, buff, n);
 	dbg_log("Syscall returned %zi", (ssize_t)ret);
 
@@ -88,8 +88,8 @@ int rvsys_read(struct proc *proc)
 		err_log("rvsys_read(): getbuff(proc, 0x%lx, %zu, %d, %d) returned NULL",
 			proc->regs[REG_A1], n, MEM_READ, MEM_READ);
 
-	dbg_log("Emulating sys_read(%d, 0x%lx (real ptr %p), %zu)", fd,
-		proc->regs[REG_A1], buff, n);
+	dbg_log("Emulating sys_read(%d (real fd %d), 0x%lx (real ptr %p), %zu)",
+		(int)proc->regs[REG_A0], fd, proc->regs[REG_A1], buff, n);
 	ret = syscall(SYS_read, fd, buff, n);
 	dbg_log("Syscall returned %zi", (ssize_t)ret);
 
