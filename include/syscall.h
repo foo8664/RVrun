@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * <one line to give the program's name and a brief idea of what it does.>
+ * Emulates Linux system calls
  *
  *  Copyright (C) 2026 by Diego Oliveira Evaristo <di.diegoevaristo@gmail.com>
  */
