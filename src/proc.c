@@ -13,6 +13,7 @@
 #include <assert.h>
 #include <limits.h>
 #include <stdbool.h>
+#include "config.h"
 
 // For resource initialization, copy emulator's soft limits
 #include <sys/types.h>
@@ -214,7 +215,7 @@ static int loadstack(struct proc *proc)
 static int loadfds(struct proc *proc)
 {
 	struct rlimit fdlimit;
-	int i;
+	struct rvopt *opt;
 
 	// Tries to copy emulator's soft limit, defaults to 512 in failure
 	proc->fdinfo.fdmax = 512;
@@ -235,7 +236,20 @@ static int loadfds(struct proc *proc)
 	}
 
 	memset(proc->fdinfo.fds, -1, proc->fdinfo.fdmax * sizeof(*proc->fdinfo.fds));
-	for (i = 0; i < 3; ++i)
-		proc->fdinfo.fds[i] = i;
+
+	// Setting stdin, stdout, and stderr of proc. Defaults to emulator's
+	if ((opt = getcfgopt(&globalcfg, SET_STDIN)) && opt->set)
+		proc->fdinfo.fds[STDIN_FILENO] = opt->u.integer;
+	else
+		proc->fdinfo.fds[STDIN_FILENO] = STDIN_FILENO;
+	if ((opt = getcfgopt(&globalcfg, SET_STDOUT)) && opt->set)
+		proc->fdinfo.fds[STDOUT_FILENO] = opt->u.integer;
+	else
+		proc->fdinfo.fds[STDOUT_FILENO] = STDOUT_FILENO;
+	if ((opt = getcfgopt(&globalcfg, SET_STDERR)) && opt->set)
+		proc->fdinfo.fds[STDERR_FILENO] = opt->u.integer;
+	else
+		proc->fdinfo.fds[STDERR_FILENO] = STDERR_FILENO;
+
 	return 0;
 }

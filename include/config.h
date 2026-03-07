@@ -9,7 +9,9 @@
 #define RISCV_CONFIG_H
 
 enum RVOPT {
-	SET_STDIN=1, // Just for testing
+	SET_STDIN=1,
+	SET_STDOUT,
+	SET_STDERR,
 };
 
 #ifdef POSIXLY_CORRECT

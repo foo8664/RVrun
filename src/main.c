@@ -82,11 +82,17 @@ static void setcfg(int argc, char **argv)
 	static struct optpair opts[] = {{
 		.rvopt = {.type = SET_STDIN},
 		.opt = {.has_arg = ARG_MANDATORY, .name = "stdin"}
+	},				{
+		.rvopt = {.type = SET_STDOUT},
+		.opt = {.has_arg = ARG_MANDATORY, .name = "stdout"}
+	},				{
+		.rvopt = {.type = SET_STDERR},
+		.opt = {.has_arg = ARG_MANDATORY, .name = "stderr"}
 	}};
 
 	static struct rvconfig cfg = {
 		.optstring = "",
-		.size = 1,
+		.size = 3,
 		.opts = opts,
 	};
 

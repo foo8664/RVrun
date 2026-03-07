@@ -4,11 +4,13 @@
 #include <string.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
 #include "debug.h"
 
 static struct rvconfig *_rvglobalcfg = NULL;
 
-static char *smemcpy(const char *src) __attribute__((nonnull, malloc(free)));
 static void freeopt(struct optpair *pair, configclean_t cleanup)
 	__attribute__((nonnull(1)));
 
@@ -48,10 +50,28 @@ void parsecfg(struct rvconfig *cfg, int argc, char **argv)
 		switch (cfg->opts[index].rvopt.type) {
 		case SET_STDIN:
 			assert(cfg->opts[index].opt.has_arg == ARG_MANDATORY);
-			cfg->opts[index].rvopt.u.str = smemcpy(optarg);
+
 			cfg->opts[index].rvopt.arg = true;
-			assert(cfg->opts[index].rvopt.u.str);
+			cfg->opts[index].rvopt.u.integer = open(optarg, O_RDONLY);
+			if (cfg->opts[index].rvopt.u.integer < 0) {
+				err_log("%s: %s", optarg, strerror(errno));
+				panic("Could not open file");
+			}
 			break;
+		case SET_STDOUT:
+		case SET_STDERR:
+			assert(cfg->opts[index].opt.has_arg == ARG_MANDATORY);
+
+			cfg->opts[index].rvopt.arg = true;
+			cfg->opts[index].rvopt.u.integer = open(optarg,
+					O_WRONLY | O_CREAT | O_TRUNC, 0777);
+			if (cfg->opts[index].rvopt.u.integer < 0) {
+				err_log("%s: %s", optarg, strerror(errno));
+				panic("Could not open file");
+			}
+			break;
+		default:
+			panic("Invalid type");
 		}
 	}
 
@@ -81,26 +101,12 @@ struct rvconfig *get_globalcfg(void)
 }
 
 
-static char *smemcpy(const char *src)
-{
-	size_t n;
-	char *dst;
-
-	n = strlen(src);
-	if (!(dst = malloc((n + 1) * sizeof(*dst))))
-		return NULL;
-
-	return strncpy(dst, src, n);
-}
-
+// SET_STDIN, STDOUT, and STDERR don't need to be closed, freeproc() does that
 static void freeopt(struct optpair *pair, configclean_t cleanup)
 {
+	if (!pair->rvopt.set)
+		return;
+
 	if (cleanup)
 		cleanup(pair);
-
-	switch (pair->rvopt.type) {
-	case SET_STDIN:
-		free(pair->rvopt.u.str);
-		break;
-	}
 }
