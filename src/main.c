@@ -7,21 +7,30 @@
 
 #include <errno.h>
 #include <string.h>
+#include <stdlib.h>
+#include <string.h>
 #include "riscv.h"
 #include "debug.h"
 #include "memory.h"
 #include "proc.h"
 #include "insn.h"
+#include "config.h"
 
 // Von Neumann fetch-decode-exec cycle, returns non-zero at error
-int exec_cycle(struct proc *proc) __attribute__((nonnull, cold));
+static int exec_cycle(struct proc *proc) __attribute__((nonnull, cold));
+// Parses options and sets globalcfg from config.h
+static void setcfg(int argc, char **argv) __attribute__((nonnull, cold));
 
-int main(void)
+int main(int argc, char **argv)
 {
 	struct proc *proc;
 	int ret;
 
-	if (!(proc = loadproc("test.elf")))
+	setcfg(argc, argv);
+	if (optind >= argc)
+		panic("Needs a file to execute");
+
+	if (!(proc = loadproc(argv[optind])))
 		return 1;
 
 	ret = exec_cycle(proc);
@@ -31,10 +40,11 @@ int main(void)
 		ret = proc->exitinfo.status;
 
 	freeproc(proc);
+	cleancfg(&globalcfg, NULL);
 	return ret;
 }
 
-int exec_cycle(struct proc *proc)
+static int exec_cycle(struct proc *proc)
 {
 	insn_func_t insn_func;
 	insn_t insn;
@@ -65,4 +75,22 @@ int exec_cycle(struct proc *proc)
 	}
 
 	return 0;
+}
+
+static void setcfg(int argc, char **argv)
+{
+	static struct optpair opts[] = {{
+		.rvopt = {.type = SET_STDIN},
+		.opt = {.has_arg = ARG_MANDATORY, .name = "stdin"}
+	}};
+
+	static struct rvconfig cfg = {
+		.optstring = "",
+		.size = 1,
+		.opts = opts,
+	};
+
+	opterr = 1;
+	parsecfg(&cfg, argc, argv);
+	set_globalcfg(&cfg);
 }
