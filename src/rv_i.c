@@ -448,6 +448,10 @@ int insn_ecall(struct proc *proc, insn_t insn)
 	switch (sysnum) {
 		ADD_SYSCALL(exit);
 		ADD_SYSCALL(exit_group);
+		ADD_SYSCALL(write);
+		ADD_SYSCALL(read);
+		ADD_SYSCALL(openat);
+		ADD_SYSCALL(close);
 	}
 #undef ADD_SYSCALL
 

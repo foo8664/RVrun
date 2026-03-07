@@ -8,7 +8,7 @@ CFLAGS += -I$(headers)
 CFLAGS += -O2
 
 VPATH = $(src):$(headers)
-objs = main.o debug.o memory.o proc.o syscall.o rv_i.o insn.o
+objs = main.o debug.o config.o memory.o proc.o syscall.o rv_i.o insn.o
 
 rvrun: $(objs)
 	$(CC) $(CFLAGS) $(objs) -o rvrun

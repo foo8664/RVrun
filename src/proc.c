@@ -11,11 +11,13 @@
 #include <stdint.h>
 #include <string.h>
 #include <assert.h>
+#include <limits.h>
 #include <stdbool.h>
 
-// For stack initialization, copy emulator's soft limit
+// For resource initialization, copy emulator's soft limits
 #include <sys/types.h>
 #include <sys/resource.h>
+#include <unistd.h>
 
 #include <elf.h>
 #include "proc.h"
@@ -25,11 +27,11 @@
 
 
 static int elfparse(FILE *file, struct proc *proc, const char *path)
-	__attribute__((nonnull, cold));
+					__attribute__((nonnull, cold));
 static int loadseg(FILE *fp, Elf64_Phdr elfph, struct proc *proc)
-	__attribute__((nonnull, cold));
-static int loadstack(struct proc *proc)
-	__attribute__((nonnull, cold));
+					__attribute__((nonnull, cold));
+static int loadstack(struct proc *proc)	__attribute__((nonnull, cold));
+static int loadfds(struct proc *proc)	__attribute__((nonnull, cold));
 
 struct proc *loadproc(const char *path)
 {
@@ -43,6 +45,8 @@ struct proc *loadproc(const char *path)
 	if (elfparse(fp, proc, path))
 		goto err_out;
 	if (loadstack(proc))
+		goto err_out;
+	if (loadfds(proc))
 		goto err_out;
 
 	proc->exitinfo.exited = false;
@@ -60,6 +64,15 @@ err_out:
 
 void freeproc(struct proc *proc)
 {
+	size_t i;
+
+	if (proc->fdinfo.fds) {
+		for (i = 0; i < proc->fdinfo.fdmax; ++i)
+			if (proc->fdinfo.fds[i] != -1)
+				close(proc->fdinfo.fds[i]);
+		free(proc->fdinfo.fds);
+	}
+
 	freemem(&proc->mem);
 	free(proc);
 }
@@ -175,8 +188,11 @@ static int loadstack(struct proc *proc)
 		return 1;
 	}
 
-	if (slimit.rlim_cur == RLIM_INFINITY)
+	if (slimit.rlim_cur == RLIM_INFINITY) {
 		slimit.rlim_cur = 2 * (1024 * 1024); // 2Mb stack
+		warn_log("loadstack(): Stack size soft limit is \"infinite\", "
+			 "reducing to %d", (int)slimit.rlim_cur);
+	}
 
 	srandom((unsigned)time(NULL));
 	do {
@@ -192,5 +208,34 @@ static int loadstack(struct proc *proc)
 	}
 
 	proc->regs[REG_SP] = start + slimit.rlim_cur;
+	return 0;
+}
+
+static int loadfds(struct proc *proc)
+{
+	struct rlimit fdlimit;
+	int i;
+
+	// Tries to copy emulator's soft limit, defaults to 512 in failure
+	proc->fdinfo.fdmax = 512;
+	if (getrlimit(RLIMIT_NOFILE, &fdlimit) == -1) {
+		warn_log("loadfds(): Could not query max fd soft limit, defaulting to %zu. Error: %s", proc->fdinfo.fdmax,
+			 strerror(errno));
+
+	} else if (fdlimit.rlim_cur == RLIM_INFINITY) {
+		warn_log("loadfds(): Soft limit of file descriptors is \"infinity\", reducing to %zu", proc->fdinfo.fdmax);
+	} else {
+		proc->fdinfo.fdmax = fdlimit.rlim_cur;
+	}
+
+	if (!(proc->fdinfo.fds = malloc(proc->fdinfo.fdmax * sizeof(
+					*proc->fdinfo.fds)))) {
+		err_log("loadfds(): malloc(): %s", strerror(errno));
+		return -1;
+	}
+
+	memset(proc->fdinfo.fds, -1, proc->fdinfo.fdmax * sizeof(*proc->fdinfo.fds));
+	for (i = 0; i < 3; ++i)
+		proc->fdinfo.fds[i] = i;
 	return 0;
 }

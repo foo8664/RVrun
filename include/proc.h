@@ -17,6 +17,12 @@ struct exitinfo {
 	bool exited;
 };
 
+#include <stddef.h>
+struct fdinfo {
+	size_t fdmax;
+	int *fds;
+};
+
 // Process structure
 struct proc {
 	reg_t regs[32]; // reg[N] is register xN
@@ -24,6 +30,7 @@ struct proc {
 
 	struct memory mem;
 	struct exitinfo exitinfo;
+	struct fdinfo fdinfo;
 };
 
 // Free's a process allocated by loadproc
