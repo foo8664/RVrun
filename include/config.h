@@ -50,17 +50,15 @@ struct rvconfig {
 	struct optpair {
 		struct rvopt rvopt;
 		struct option opt;
+		const char *help;
 	} *opts;
 };
 
-typedef void (*configclean_t(struct optpair *));
 /*
  * Cleans a config created by a call parsecfg(), does not free either cfg
- * or cfg->opts, as they may not be dynamically allocated. Calls cleanup()
- * on every element of cfg->opts
+ * or cfg->opts, as they may not be dynamically allocated.
  */
-void cleancfg(struct rvconfig *cfg, configclean_t cleanup)
-	__attribute__((nonnull(1)));
+void cleancfg(struct rvconfig *cfg) __attribute__((nonnull));
 
 // Parses argv and creates a config to be used by the program
 void parsecfg(struct rvconfig *cfg, int argc, char **argv)
