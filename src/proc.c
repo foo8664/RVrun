@@ -68,7 +68,7 @@ void freeproc(struct proc *proc)
 	size_t i;
 
 	if (proc->fdinfo.fds) {
-		for (i = 0; i < proc->fdinfo.fdmax; ++i)
+		for (i = 3; i < proc->fdinfo.fdmax; ++i)
 			if (proc->fdinfo.fds[i] != -1)
 				close(proc->fdinfo.fds[i]);
 		free(proc->fdinfo.fds);
@@ -238,15 +238,15 @@ static int loadfds(struct proc *proc)
 	memset(proc->fdinfo.fds, -1, proc->fdinfo.fdmax * sizeof(*proc->fdinfo.fds));
 
 	// Setting stdin, stdout, and stderr of proc. Defaults to emulator's
-	if ((opt = getcfgopt(&globalcfg, SET_STDIN)) && opt->set)
+	if ((opt = getcfgopt(&globalcfg, CFG_STDIN)) && opt->set)
 		proc->fdinfo.fds[STDIN_FILENO] = opt->u.integer;
 	else
 		proc->fdinfo.fds[STDIN_FILENO] = STDIN_FILENO;
-	if ((opt = getcfgopt(&globalcfg, SET_STDOUT)) && opt->set)
+	if ((opt = getcfgopt(&globalcfg, CFG_STDOUT)) && opt->set)
 		proc->fdinfo.fds[STDOUT_FILENO] = opt->u.integer;
 	else
 		proc->fdinfo.fds[STDOUT_FILENO] = STDOUT_FILENO;
-	if ((opt = getcfgopt(&globalcfg, SET_STDERR)) && opt->set)
+	if ((opt = getcfgopt(&globalcfg, CFG_STDERR)) && opt->set)
 		proc->fdinfo.fds[STDERR_FILENO] = opt->u.integer;
 	else
 		proc->fdinfo.fds[STDERR_FILENO] = STDERR_FILENO;

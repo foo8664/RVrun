@@ -26,6 +26,7 @@ int main(int argc, char **argv)
 	struct proc *proc;
 	int ret;
 
+	setdbgcfg();
 	setcfg(argc, argv);
 	if (optind >= argc)
 		panic("Needs a file to execute");
@@ -80,23 +81,30 @@ static int exec_cycle(struct proc *proc)
 static void setcfg(int argc, char **argv)
 {
 	static struct optpair opts[] = {{
-		.rvopt = {.type = SET_STDIN},
+		.rvopt = {.type = CFG_STDIN},
 		.opt = {.has_arg = ARG_MANDATORY, .name = "stdin"}
 	},				{
-		.rvopt = {.type = SET_STDOUT},
+		.rvopt = {.type = CFG_STDOUT},
 		.opt = {.has_arg = ARG_MANDATORY, .name = "stdout"}
 	},				{
-		.rvopt = {.type = SET_STDERR},
+		.rvopt = {.type = CFG_STDERR},
 		.opt = {.has_arg = ARG_MANDATORY, .name = "stderr"}
+	},				{
+		.rvopt = {.type = CFG_LOGFILE},
+		.opt = {.has_arg = ARG_MANDATORY, .name = "log-file"}
+	},				{
+		.rvopt = {.type = CFG_LOGLEVEL},
+		.opt = {.has_arg = ARG_MANDATORY, .name = "log-level"}
 	}};
 
 	static struct rvconfig cfg = {
 		.optstring = "",
-		.size = 3,
+		.size = 5,
 		.opts = opts,
 	};
 
 	opterr = 1;
 	parsecfg(&cfg, argc, argv);
 	set_globalcfg(&cfg);
+	setdbgcfg();
 }

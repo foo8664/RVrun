@@ -1,5 +1,6 @@
 #include "config.h"
 #include <getopt.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -48,7 +49,7 @@ void parsecfg(struct rvconfig *cfg, int argc, char **argv)
 			continue;
 
 		switch (cfg->opts[index].rvopt.type) {
-		case SET_STDIN:
+		case CFG_STDIN:
 			assert(cfg->opts[index].opt.has_arg == ARG_MANDATORY);
 
 			cfg->opts[index].rvopt.arg = true;
@@ -58,8 +59,9 @@ void parsecfg(struct rvconfig *cfg, int argc, char **argv)
 				panic("Could not open file");
 			}
 			break;
-		case SET_STDOUT:
-		case SET_STDERR:
+
+		case CFG_STDOUT:
+		case CFG_STDERR:
 			assert(cfg->opts[index].opt.has_arg == ARG_MANDATORY);
 
 			cfg->opts[index].rvopt.arg = true;
@@ -70,8 +72,38 @@ void parsecfg(struct rvconfig *cfg, int argc, char **argv)
 				panic("Could not open file");
 			}
 			break;
+
+		case CFG_LOGFILE:
+			assert(cfg->opts[index].opt.has_arg == ARG_MANDATORY);
+
+			cfg->opts[index].rvopt.arg = true;
+			cfg->opts[index].rvopt.u.ptr = (void *)fopen(optarg, "w");
+			if (!cfg->opts[index].rvopt.u.ptr) {
+				err_log("%s: %s", optarg, strerror(errno));
+				panic("Could not open file");
+			}
+			break;
+
+		case CFG_LOGLEVEL:
+			assert(cfg->opts[index].opt.has_arg == ARG_MANDATORY);
+
+			cfg->opts[index].rvopt.arg = true;
+			if (sscanf(optarg, "%u", &cfg->opts[index].rvopt.u.uint) != 1) {
+				err_log("%s: %s", optarg, strerror(errno));
+				panic("Could not get log-level");
+			}
+
+			if (cfg->opts[index].rvopt.u.uint > ERR_LOGLEVEL) {
+				warn_log("Invalid log level %d, Reducing to %d",
+					 cfg->opts[index].rvopt.u.uint,
+					 ERR_LOGLEVEL);
+				cfg->opts[index].rvopt.u.uint = ERR_LOGLEVEL;
+			}
+
+			break;
+
 		default:
-			panic("Invalid type");
+			panic("Invalid option type");
 		}
 	}
 
@@ -101,7 +133,6 @@ struct rvconfig *get_globalcfg(void)
 }
 
 
-// SET_STDIN, STDOUT, and STDERR don't need to be closed, freeproc() does that
 static void freeopt(struct optpair *pair, configclean_t cleanup)
 {
 	if (!pair->rvopt.set)
@@ -109,4 +140,19 @@ static void freeopt(struct optpair *pair, configclean_t cleanup)
 
 	if (cleanup)
 		cleanup(pair);
+
+	switch (pair->rvopt.type) {
+	case CFG_LOGFILE:
+		fclose((FILE *)pair->rvopt.u.ptr);
+		break;
+
+	case CFG_STDIN:
+	case CFG_STDOUT:
+	case CFG_STDERR:
+		close(pair->rvopt.u.integer);
+		break;
+
+	default:
+		break;
+	}
 }

@@ -8,6 +8,16 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
+enum LOGLEVEL {
+	DBG_LOGLEVEL, INFO_LOGLEVEL, WARN_LOGLEVEL, ERR_LOGLEVEL
+};
+
+/*
+ * Updates logfile and loglevel based on globalcfg from config.h, must be
+ * called before using any of the *_log() or panic() functions
+ */
+void setdbgcfg(void) __attribute__((cold));
+
 /*
  * Logging functions, work like fprintf(stderr, fmt, ...) but display a message
  * such as "[DEBUG]", "[INFO]", etc. Should be preferred as log-file, filtering,
