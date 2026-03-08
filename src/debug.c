@@ -87,7 +87,7 @@ void err_log(const char *restrict fmt, ...)
 	if (loglevel > ERR_LOGLEVEL)
 		return;
 
-	fputs("[WARNING]: ", logfile);
+	fputs("[ERROR]: ", logfile);
 
 	va_start(args, fmt);
 	vfprintf(logfile, fmt, args);
