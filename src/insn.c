@@ -38,7 +38,7 @@ int insn_fetch(struct proc *proc, insn_t *insn)
 int (*insn_decode(insn_t insn))(struct proc *, insn_t)
 {
 	// Rv64I instructions
-	// R-type:
+	// Register-Register:
 	ADD_INSN(ADD,	insn_add);
 	ADD_INSN(SLT,	insn_slt);
 	ADD_INSN(SLTU,	insn_sltu);
@@ -55,7 +55,7 @@ int (*insn_decode(insn_t insn))(struct proc *, insn_t)
 	ADD_INSN(SRLW,	insn_srlw);
 	ADD_INSN(SRLW,	insn_srlw);
 
-	// I-type:
+	// Register-Immediate:
 	ADD_INSN(ANDI,	insn_andi);
 	ADD_INSN(ORI, 	insn_ori);
 	ADD_INSN(XORI,	insn_xori);
@@ -70,10 +70,12 @@ int (*insn_decode(insn_t insn))(struct proc *, insn_t)
 	ADD_INSN(SLLIW,	insn_slliw);
 	ADD_INSN(SRLIW,	insn_srliw);
 	ADD_INSN(SRAIW,	insn_sraiw);
-
-	// U-type:
 	ADD_INSN(LUI,	insn_lui);
 	ADD_INSN(AUIPC,	insn_auipc);
+
+	// Jump:
+	ADD_INSN(JAL,	insn_jal);
+	ADD_INSN(JALR,	insn_jalr);
 
 	errno = ENOSYS;
 	return NULL;

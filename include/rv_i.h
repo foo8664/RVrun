@@ -54,4 +54,8 @@ int insn_sraiw(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_lui(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_auipc(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 
+// J-type instructions
+int insn_jal(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_jalr(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+
 #endif // RISCV_RV64I_H

@@ -9,6 +9,7 @@
 #define RISCV_H
 
 #define XLEN 64
+#define IALIGN 4 // In bytes
 
 #include <stdint.h>
 typedef uint64_t reg_t;

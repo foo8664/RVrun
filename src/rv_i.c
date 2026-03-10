@@ -22,6 +22,9 @@ static inline void I_getfields(insn_t insn, enum ABI_REG *rd, enum ABI_REG *rs1,
 			       uint64_t *imm) __attribute__((nonnull));
 static inline void U_getfields(insn_t insn, enum ABI_REG *rd, uint64_t *imm)
 			       __attribute__((nonnull));
+static inline void J_getfields(insn_t insn, enum ABI_REG *rd, uint64_t *imm)
+			       __attribute__((nonnull));
+
 static inline uint64_t extend64(uint32_t i32) __attribute__((nonnull));
 
 
@@ -47,6 +50,16 @@ static inline void U_getfields(insn_t insn, enum ABI_REG *rd, uint64_t *imm)
 	*rd =	(enum ABI_REG)((insn & 0xf80) >> 7);
 	*imm =	(uint64_t)(insn & 0xfffff000);
 	*imm |= (uint64_t)((insn & 0x80000000) ? 0xffffffff00000000lu : 0lu);
+}
+
+static inline void J_getfields(insn_t insn, enum ABI_REG *rd, uint64_t *imm)
+{
+	*rd = (enum ABI_REG)((insn & 0xf80)	>> 7);
+	*imm =  (uint64_t)((insn & 0xffc00000)	>> 20);
+	*imm |= (uint64_t)((insn & 0x100000)	>> 9);
+	*imm |= (uint64_t)((insn & 0xff000)	>> 0);
+	*imm |= (uint64_t)((insn & (1u << 31))	>> 11);
+	*imm |= (uint64_t)((insn & (1u << 31)) ? (0xffffffffffflu << 20) : 0lu);
 }
 
 static inline uint64_t extend64(uint32_t i32)
@@ -431,6 +444,44 @@ int insn_auipc(struct proc *proc, insn_t insn)
 	U_getfields(insn, &rd, &imm);
 	mvreg(proc, rd, (reg_t)(proc->pc + imm));
 	dbg_log("auipc: x%d = 0x%lx + 0x%lx", rd, proc->pc, imm);
+	return 0;
+}
+
+int insn_jal(struct proc *proc, insn_t insn)
+{
+	uint64_t imm;
+	enum ABI_REG rd;
+
+	J_getfields(insn, &rd, &imm);
+	mvreg(proc, rd, (reg_t)(proc->pc + 4));
+	dbg_log("jal: x%d = 0x%lx . pc += 0x%lx", rd, getreg(proc, rd), imm);
+	proc->pc += imm - 4; // Cycle always adds size of current instruction
+	if (proc->pc % IALIGN != 0) {
+		err_log("pc (0x%lx) is not aligned to IALIGN (%u)",
+			proc->pc, IALIGN * 8);
+		panic("Instruction-address-misaligned exception");
+	}
+	return 0;
+}
+
+int insn_jalr(struct proc *proc, insn_t insn)
+{
+	enum ABI_REG rd;
+	enum ABI_REG rs1;
+	uint64_t imm;
+
+	I_getfields(insn, &rd, &rs1, &imm);
+	mvreg(proc, rd, (reg_t)(proc->pc + 4));
+	dbg_log("jalr: x%d = 0x%lx. pc = x%d (0x%lx) + 0x%lx", rd,
+		getreg(proc, rd), rs1, getreg(proc, rs1), imm);
+
+	// Cycle always adds size of current instruction
+	proc->pc = (rvaddr_t)(getreg(proc, rs1) + imm - 4);
+	if (proc->pc % IALIGN != 0) {
+		err_log("pc (0x%lx) is not aligned to IALIGN (%u)",
+			proc->pc, IALIGN * 8);
+		panic("Instruction-address-misaligned exception");
+	}
 	return 0;
 }
 
