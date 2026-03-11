@@ -17,7 +17,7 @@
  * 32bit verbatim representation
  */
 
-// R-type instructions
+// Register-Register instructions
 int insn_add(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_slt(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_sltu(struct proc *proc, insn_t insn)	__attribute__((nonnull));
@@ -34,7 +34,7 @@ int insn_sllw(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_srlw(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_sraw(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 
-// I-type instructions
+// Register-Immediate instructions
 int insn_andi(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_ori(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_xori(struct proc *proc, insn_t insn)	__attribute__((nonnull));
@@ -49,13 +49,17 @@ int insn_addiw(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_slliw(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_srliw(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_sraiw(struct proc *proc, insn_t insn)	__attribute__((nonnull));
-
-// U-type instructions
 int insn_lui(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_auipc(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 
-// J-type instructions
+// Jump instructions
 int insn_jal(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_jalr(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_beq(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_bne(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_blt(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_bltu(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_bge(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_bgeu(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 
 #endif // RISCV_RV64I_H

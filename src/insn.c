@@ -76,6 +76,12 @@ int (*insn_decode(insn_t insn))(struct proc *, insn_t)
 	// Jump:
 	ADD_INSN(JAL,	insn_jal);
 	ADD_INSN(JALR,	insn_jalr);
+	ADD_INSN(BEQ,	insn_beq);
+	ADD_INSN(BNE,	insn_bne);
+	ADD_INSN(BLT,	insn_blt);
+	ADD_INSN(BLTU,	insn_bltu);
+	ADD_INSN(BGE,	insn_bge);
+	ADD_INSN(BGEU,	insn_bgeu);
 
 	errno = ENOSYS;
 	return NULL;

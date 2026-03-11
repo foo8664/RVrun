@@ -19,11 +19,13 @@
 static inline void R_getfields(insn_t insn, enum ABI_REG *rd, enum ABI_REG *rs1,
 			       enum ABI_REG *rs2) __attribute__((nonnull));
 static inline void I_getfields(insn_t insn, enum ABI_REG *rd, enum ABI_REG *rs1,
-			       uint64_t *imm) __attribute__((nonnull));
+			       uint64_t *imm)	__attribute__((nonnull));
 static inline void U_getfields(insn_t insn, enum ABI_REG *rd, uint64_t *imm)
-			       __attribute__((nonnull));
+						__attribute__((nonnull));
 static inline void J_getfields(insn_t insn, enum ABI_REG *rd, uint64_t *imm)
-			       __attribute__((nonnull));
+						__attribute__((nonnull));
+static inline void B_getfields(insn_t insn, enum ABI_REG *rs1, enum ABI_REG *rs2,
+			       uint64_t *imm)	__attribute__((nonnull));
 
 static inline uint64_t extend64(uint32_t i32) __attribute__((nonnull));
 
@@ -62,10 +64,23 @@ static inline void J_getfields(insn_t insn, enum ABI_REG *rd, uint64_t *imm)
 	*imm |= (uint64_t)((insn & (1u << 31)) ? (0xffffffffffflu << 20) : 0lu);
 }
 
+static inline void B_getfields(insn_t insn, enum ABI_REG *rs1, enum ABI_REG *rs2,
+			       uint64_t *imm)
+{
+	*rs1 = (enum ABI_REG)(	(insn & 0xf8000) >> 15);
+	*rs2 = (enum ABI_REG)(	(insn & 0x1f00000) >> 20);
+	*imm =  (uint64_t)(	(insn & (0xf  << 8))  >> 7);
+	*imm |= (uint64_t)(	(insn & (0x3f << 25)) >> 20);
+	*imm |= (uint64_t)(	(insn & (0x1  << 7))  << 4);
+	*imm |= (uint64_t)(	(insn & (0x1u << 31u)) ? (~0lu << 12) : 0lu);
+}
+
+
 static inline uint64_t extend64(uint32_t i32)
 {
 	return i32 & 0x80000000 ? (uint64_t)i32 | (~0lu << 32) : i32;
 }
+
 
 int insn_add(struct proc *proc, insn_t insn)
 {
@@ -457,7 +472,7 @@ int insn_jal(struct proc *proc, insn_t insn)
 	dbg_log("jal: x%d = 0x%lx . pc += 0x%lx", rd, getreg(proc, rd), imm);
 	proc->pc += imm - 4; // Cycle always adds size of current instruction
 	if (proc->pc % IALIGN != 0) {
-		err_log("pc (0x%lx) is not aligned to IALIGN (%u)",
+		err_log("pc (0x%lx) is not bit-aligned to IALIGN (%u)",
 			proc->pc, IALIGN * 8);
 		panic("Instruction-address-misaligned exception");
 	}
@@ -478,10 +493,148 @@ int insn_jalr(struct proc *proc, insn_t insn)
 	// Cycle always adds size of current instruction
 	proc->pc = (rvaddr_t)(getreg(proc, rs1) + imm - 4);
 	if (proc->pc % IALIGN != 0) {
-		err_log("pc (0x%lx) is not aligned to IALIGN (%u)",
+		err_log("pc (0x%lx) is not bit-aligned to IALIGN (%u)",
 			proc->pc, IALIGN * 8);
 		panic("Instruction-address-misaligned exception");
 	}
+	return 0;
+}
+
+int insn_beq(struct proc *proc, insn_t insn)
+{
+	enum ABI_REG rs1;
+	enum ABI_REG rs2;
+	uint64_t imm;
+
+	B_getfields(insn, &rs1, &rs2, &imm);
+	dbg_log("beq: Comparing x%d (0x%lx) to x%d (0x%lx), pc: 0x%lx, offset: 0x%lx",
+		rs1, getreg(proc, rs1), rs2, getreg(proc, rs2), proc->pc, imm);
+
+	if (getreg(proc, rs1) == getreg(proc, rs2)) {
+		// Cycle always adds size of current instruction
+		proc->pc += imm - 4;
+		if (proc->pc % IALIGN != 0) {
+			err_log("pc (0x%lx) is not bit-aligned to IALIGN (%u)",
+				proc->pc, IALIGN * 8);
+			panic("Instruction-address-misaligned exception");
+		}
+	}
+
+	return 0;
+}
+
+int insn_bne(struct proc *proc, insn_t insn)
+{
+	enum ABI_REG rs1;
+	enum ABI_REG rs2;
+	uint64_t imm;
+
+	B_getfields(insn, &rs1, &rs2, &imm);
+	dbg_log("bne: Comparing x%d (0x%lx) to x%d (0x%lx), pc: 0x%lx, offset: 0x%lx",
+		rs1, getreg(proc, rs1), rs2, getreg(proc, rs2), proc->pc, imm);
+
+	if (getreg(proc, rs1) != getreg(proc, rs2)) {
+		// Cycle always adds size of current instruction
+		proc->pc += imm - 4;
+		if (proc->pc % IALIGN != 0) {
+			err_log("pc (0x%lx) is not bit-aligned to IALIGN (%u)",
+				proc->pc, IALIGN * 8);
+			panic("Instruction-address-misaligned exception");
+		}
+	}
+
+	return 0;
+}
+
+int insn_blt(struct proc *proc, insn_t insn)
+{
+	enum ABI_REG rs1;
+	enum ABI_REG rs2;
+	uint64_t imm;
+
+	B_getfields(insn, &rs1, &rs2, &imm);
+	dbg_log("blt: Comparing x%d (0x%lx) to x%d (0x%lx), pc: 0x%lx, offset: 0x%lx",
+		rs1, getreg(proc, rs1), rs2, getreg(proc, rs2), proc->pc, imm);
+
+	if ((ireg_t)getreg(proc, rs1) < (ireg_t)getreg(proc, rs2)) {
+		// Cycle always adds size of current instruction
+		proc->pc += imm - 4;
+		if (proc->pc % IALIGN != 0) {
+			err_log("pc (0x%lx) is not bit-aligned to IALIGN (%u)",
+				proc->pc, IALIGN * 8);
+			panic("Instruction-address-misaligned exception");
+		}
+	}
+
+	return 0;
+}
+
+int insn_bltu(struct proc *proc, insn_t insn)
+{
+	enum ABI_REG rs1;
+	enum ABI_REG rs2;
+	uint64_t imm;
+
+	B_getfields(insn, &rs1, &rs2, &imm);
+	dbg_log("bltu: Comparing x%d (0x%lx) to x%d (0x%lx), pc: 0x%lx, offset: 0x%lx",
+		rs1, getreg(proc, rs1), rs2, getreg(proc, rs2), proc->pc, imm);
+
+	if ((ureg_t)getreg(proc, rs1) < (ureg_t)getreg(proc, rs2)) {
+		// Cycle always adds size of current instruction
+		proc->pc += imm - 4;
+		if (proc->pc % IALIGN != 0) {
+			err_log("pc (0x%lx) is not bit-aligned to IALIGN (%u)",
+				proc->pc, IALIGN * 8);
+			panic("Instruction-address-misaligned exception");
+		}
+	}
+
+	return 0;
+}
+
+int insn_bge(struct proc *proc, insn_t insn)
+{
+	enum ABI_REG rs1;
+	enum ABI_REG rs2;
+	uint64_t imm;
+
+	B_getfields(insn, &rs1, &rs2, &imm);
+	dbg_log("bge: Comparing x%d (0x%lx) to x%d (0x%lx), pc: 0x%lx, offset: 0x%lx",
+		rs1, getreg(proc, rs1), rs2, getreg(proc, rs2), proc->pc, imm);
+
+	if ((ireg_t)getreg(proc, rs1) > (ireg_t)getreg(proc, rs2)) {
+		// Cycle always adds size of current instruction
+		proc->pc += imm - 4;
+		if (proc->pc % IALIGN != 0) {
+			err_log("pc (0x%lx) is not bit-aligned to IALIGN (%u)",
+				proc->pc, IALIGN * 8);
+			panic("Instruction-address-misaligned exception");
+		}
+	}
+
+	return 0;
+}
+
+int insn_bgeu(struct proc *proc, insn_t insn)
+{
+	enum ABI_REG rs1;
+	enum ABI_REG rs2;
+	uint64_t imm;
+
+	B_getfields(insn, &rs1, &rs2, &imm);
+	dbg_log("bgeu: Comparing x%d (0x%lx) to x%d (0x%lx), pc: 0x%lx, offset: 0x%lx",
+		rs1, getreg(proc, rs1), rs2, getreg(proc, rs2), proc->pc, imm);
+
+	if ((ureg_t)getreg(proc, rs1) > (ureg_t)getreg(proc, rs2)) {
+		// Cycle always adds size of current instruction
+		proc->pc += imm - 4;
+		if (proc->pc % IALIGN != 0) {
+			err_log("pc (0x%lx) is not bit-aligned to IALIGN (%u)",
+				proc->pc, IALIGN * 8);
+			panic("Instruction-address-misaligned exception");
+		}
+	}
+
 	return 0;
 }
 
