@@ -66,6 +66,7 @@ int memloadN(struct memory mem, rvaddr_t addr, uint8_t size, void *out)
 int memstoreN(struct memory mem, rvaddr_t addr, uint8_t size, const void *in)
 	__attribute__((nonnull, access(read_only, 4)));
 
+#include <stdlib.h>
 #define memload(mem, addr, ptr) (_Generic(ptr,				\
 		uint8_t *:  memloadN(mem, addr, 8,  (void *)ptr),	\
 		uint16_t *: memloadN(mem, addr, 16, (void *)ptr),	\
