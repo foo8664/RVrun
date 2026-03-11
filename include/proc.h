@@ -46,21 +46,23 @@ static inline void mvreg(struct proc *proc, enum ABI_REG reg, reg_t val)
 static inline reg_t getreg(const struct proc *proc, enum ABI_REG reg)
 	__attribute__((nonnull));
 
-#include <assert.h>
+#include "debug.h"
 static inline void mvreg(struct proc *proc, enum ABI_REG reg, reg_t val)
 {
-	assert(reg < 32);
-
-	if (reg != 0)
-		proc->regs[reg] = val;
+	if (reg > 32) {
+		err_log("Invalid Register x%d", reg);
+		panic("Tried to access inexistent register");
+	}
+	proc->regs[reg] = (reg ? val : 0);
 }
 
 static inline reg_t getreg(const struct proc *proc, enum ABI_REG reg)
 {
-	assert(reg < 32);
-	if (reg == 0)
-		return 0;
-	return proc->regs[reg];
+	if (reg > 32) {
+		err_log("Invalid Register x%d", reg);
+		panic("Tried to access inexistent register");
+	}
+	return (reg ? proc->regs[reg] : 0);
 }
 
 #endif /* LOADER_H */
