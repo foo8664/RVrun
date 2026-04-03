@@ -91,6 +91,10 @@ int (*insn_decode(insn_t insn))(struct proc *, insn_t)
 	ADD_INSN(LBU,	insn_lbu);
 	ADD_INSN(LHU,	insn_lhu);
 	ADD_INSN(LWU,	insn_lwu);
+	ADD_INSN(SB,	insn_sb);
+	ADD_INSN(SH,	insn_sh);
+	ADD_INSN(SW,	insn_sw);
+	ADD_INSN(SD,	insn_sd);
 
 	errno = ENOSYS;
 	return NULL;

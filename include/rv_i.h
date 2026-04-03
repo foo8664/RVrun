@@ -70,6 +70,10 @@ int insn_lbu(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_lhu(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_lwu(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_ld(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_sb(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_sh(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_sw(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_sd(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 
 
 #endif // RISCV_RV64I_H

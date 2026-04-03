@@ -30,6 +30,8 @@ static inline void J_getfields(insn_t insn, enum ABI_REG *rd, uint64_t *imm)
 						__attribute__((nonnull));
 static inline void B_getfields(insn_t insn, enum ABI_REG *rs1, enum ABI_REG *rs2,
 			       uint64_t *imm)	__attribute__((nonnull));
+static inline void S_getfields(insn_t insn, enum ABI_REG *rs1, enum ABI_REG *rs2,
+		               uint64_t *imm)	__attribute__((nonnull));
 
 // Sign-extend/Zero-extend values
 static inline uint64_t extend32to64(uint32_t i32);
@@ -77,12 +79,22 @@ static inline void J_getfields(insn_t insn, enum ABI_REG *rd, uint64_t *imm)
 static inline void B_getfields(insn_t insn, enum ABI_REG *rs1, enum ABI_REG *rs2,
 			       uint64_t *imm)
 {
-	*rs1 = (enum ABI_REG)(	(insn & 0xf8000) >> 15);
-	*rs2 = (enum ABI_REG)(	(insn & 0x1f00000) >> 20);
-	*imm =  (uint64_t)(	(insn & (0xf  << 8))  >> 7);
-	*imm |= (uint64_t)(	(insn & (0x3f << 25)) >> 20);
-	*imm |= (uint64_t)(	(insn & (0x1  << 7))  << 4);
-	*imm |= (uint64_t)(	(insn & (0x1u << 31u)) ? (~0lu << 12) : 0lu);
+	*rs1 = (enum ABI_REG)((insn & 0xf8000) >> 15);
+	*rs2 = (enum ABI_REG)((insn & 0x1f00000) >> 20);
+	*imm =  (uint64_t)((insn & (0xf  << 8))  >> 7);
+	*imm |= (uint64_t)((insn & (0x3f << 25)) >> 20);
+	*imm |= (uint64_t)((insn & (0x1  << 7))  << 4);
+	*imm |= (uint64_t)((insn & (0x1u << 31u)) ? (~0lu << 12) : 0lu);
+}
+
+static inline void S_getfields(insn_t insn, enum ABI_REG *rs1, enum ABI_REG *rs2,
+		               uint64_t *imm)
+{
+	*rs1 = (enum ABI_REG)((insn & 0xf8000)	>> 15);
+	*rs2 = (enum ABI_REG)((insn & 0xf00000)	>> 20);
+	*imm =  (uint64_t)((insn & 0xf80)	>> 7);
+	*imm |= (uint64_t)((insn & 0xfe000000)	>> 20);
+	*imm |= (uint64_t)((insn & (0x1u << 31u)) ? (~0lu << 12) : 0lu);
 }
 
 
@@ -688,8 +700,8 @@ int insn_lb(struct proc *proc, insn_t insn)
 	}
 
 	dbg_log("lb: Loading %hhd from 0x%lx into x%d", (int8_t)val,
-		getreg(proc, rs1) + imm, rs1);
-	mvreg(proc, rs1, (reg_t)extend8to64(val));
+		getreg(proc, rs1) + imm, rd);
+	mvreg(proc, rd, (reg_t)extend8to64(val));
 	return 0;
 }
 
@@ -708,8 +720,8 @@ int insn_lh(struct proc *proc, insn_t insn)
 	}
 
 	dbg_log("lh: Loading %hd from 0x%lx into x%d", (int16_t)val,
-		getreg(proc, rs1) + imm, rs1);
-	mvreg(proc, rs1, (reg_t)extend16to64(val));
+		getreg(proc, rs1) + imm, rd);
+	mvreg(proc, rd, (reg_t)extend16to64(val));
 	return 0;
 }
 
@@ -728,8 +740,8 @@ int insn_lw(struct proc *proc, insn_t insn)
 	}
 
 	dbg_log("lw: Loading %d from 0x%lx into x%d", (int32_t)val,
-		getreg(proc, rs1) + imm, rs1);
-	mvreg(proc, rs1, (reg_t)extend32to64(val));
+		getreg(proc, rs1) + imm, rd);
+	mvreg(proc, rd, (reg_t)extend32to64(val));
 	return 0;
 }
 
@@ -748,8 +760,8 @@ int insn_ld(struct proc *proc, insn_t insn)
 	}
 
 	dbg_log("ld: Loading %ld from 0x%lx into x%d", (int64_t)val,
-		getreg(proc, rs1) + imm, rs1);
-	mvreg(proc, rs1, (reg_t)val);
+		getreg(proc, rs1) + imm, rd);
+	mvreg(proc, rd, (reg_t)val);
 	return 0;
 }
 
@@ -768,8 +780,8 @@ int insn_lwu(struct proc *proc, insn_t insn)
 	}
 
 	dbg_log("lwu: Loading %u from 0x%lx into x%d", val,
-		getreg(proc, rs1) + imm, rs1);
-	mvreg(proc, rs1, (reg_t)zextend32to64(val));
+		getreg(proc, rs1) + imm, rd);
+	mvreg(proc, rd, (reg_t)zextend32to64(val));
 	return 0;
 }
 
@@ -788,8 +800,8 @@ int insn_lhu(struct proc *proc, insn_t insn)
 	}
 
 	dbg_log("lhu: Loading %hu from 0x%lx into x%d", val,
-		getreg(proc, rs1) + imm, rs1);
-	mvreg(proc, rs1, (reg_t)zextend16to64(val));
+		getreg(proc, rs1) + imm, rd);
+	mvreg(proc, rd, (reg_t)zextend16to64(val));
 	return 0;
 }
 
@@ -808,11 +820,94 @@ int insn_lbu(struct proc *proc, insn_t insn)
 	}
 
 	dbg_log("lbu: Loading %hhu from 0x%lx into x%d", val,
-		getreg(proc, rs1) + imm, rs1);
-	mvreg(proc, rs1, (reg_t)zextend8to64(val));
+		getreg(proc, rs1) + imm, rd);
+	mvreg(proc, rd, (reg_t)zextend8to64(val));
 	return 0;
 }
 
+int insn_sb(struct proc *proc, insn_t insn)
+{
+	enum ABI_REG rs1;
+	enum ABI_REG rs2;
+	uint64_t imm;
+	uint8_t val;
+
+	S_getfields(insn, &rs1, &rs2, &imm);
+	val = (uint8_t)(getreg(proc, rs2) & 0xff);
+
+	dbg_log("sb: Storing %hhu from x%d into 0x%lx", val, rs2,
+		getreg(proc, rs1) + imm);
+	if (memstore(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1) {
+		err_log("sb: Could not store address 0x%lx: %s",
+			getreg(proc, rs1) + imm, strerror(errno));
+		return -1;
+	}
+
+	return 0;
+}
+
+int insn_sh(struct proc *proc, insn_t insn)
+{
+	enum ABI_REG rs1;
+	enum ABI_REG rs2;
+	uint64_t imm;
+	uint16_t val;
+
+	S_getfields(insn, &rs1, &rs2, &imm);
+	val = (uint16_t)(getreg(proc, rs2) & 0xffff);
+
+	dbg_log("sh: Storing %hu from x%d into 0x%lx", val, rs2,
+		getreg(proc, rs1) + imm);
+	if (memstore(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1) {
+		err_log("sh: Could not store address 0x%lx: %s",
+			getreg(proc, rs1) + imm, strerror(errno));
+		return -1;
+	}
+
+	return 0;
+}
+
+int insn_sw(struct proc *proc, insn_t insn)
+{
+	enum ABI_REG rs1;
+	enum ABI_REG rs2;
+	uint64_t imm;
+	uint32_t val;
+
+	S_getfields(insn, &rs1, &rs2, &imm);
+	val = (uint32_t)(getreg(proc, rs2) & 0xffffffff);
+
+	dbg_log("sw: Storing %u from x%d into 0x%lx", val, rs2,
+		getreg(proc, rs1) + imm);
+	if (memstore(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1) {
+		err_log("sw: Could not store address 0x%lx: %s",
+			getreg(proc, rs1) + imm, strerror(errno));
+		return -1;
+	}
+
+	return 0;
+}
+
+int insn_sd(struct proc *proc, insn_t insn)
+{
+	enum ABI_REG rs1;
+	enum ABI_REG rs2;
+	uint64_t imm;
+	uint64_t val;
+
+	S_getfields(insn, &rs1, &rs2, &imm);
+	val = (uint64_t)getreg(proc, rs2);
+
+	dbg_log("sd: Storing %lu from x%d into 0x%lx", val, rs2,
+		getreg(proc, rs1) + imm);
+	if (memstore(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1) {
+		err_log("sd: Could not store address 0x%lx: %s",
+			getreg(proc, rs1) + imm, strerror(errno));
+		return -1;
+	}
+
+	return 0;
+}
 // Ignores rd and rs1, only implements linux system calls
 int insn_ecall(struct proc *proc, insn_t insn)
 {
