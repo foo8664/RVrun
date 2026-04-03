@@ -138,8 +138,8 @@ int insn_add(struct proc *proc, insn_t insn)
 
 	R_getfields(insn, &rd, &rs1, &rs2);
 	mvreg(proc, rd, getreg(proc, rs1) + getreg(proc, rs2));
-	dbg_log("add: setting x%d to x%d + x%d = %ld", rd, rs1, rs2,
-		getreg(proc, rd));
+	dbg_log("add: setting %s to %s + %s = %ld", reg2abi(rd), reg2abi(rs1),
+		reg2abi(rs2), getreg(proc, rd));
 	return 0;
 }
 
@@ -151,8 +151,8 @@ int insn_slt(struct proc *proc, insn_t insn)
 
 	R_getfields(insn, &rd, &rs1, &rs2);
 	mvreg(proc, rd, (ireg_t)getreg(proc, rs1) < (ireg_t)getreg(proc, rs2));
-	dbg_log("stl: Setting x%d to %ld: x%d < x%d?", rd, getreg(proc, rd),
-		rs1, rs2);
+	dbg_log("stl: Setting %s to %ld: %s < %s?", reg2abi(rd), getreg(proc, rd),
+		reg2abi(rs1), reg2abi(rs2));
 	return 0;
 }
 
@@ -164,8 +164,8 @@ int insn_sltu(struct proc *proc, insn_t insn)
 
 	R_getfields(insn, &rd, &rs1, &rs2);
 	mvreg(proc, rd, (ureg_t)getreg(proc, rs1) < (ureg_t)getreg(proc, rs2));
-	dbg_log("stlu: Setting x%d to %ld: x%d < x%d?", rd, getreg(proc, rd),
-		rs1, rs2);
+	dbg_log("stlu: Setting %s to %ld: %s < %s?", reg2abi(rd), getreg(proc, rd),
+		reg2abi(rs1), reg2abi(rs2));
 	return 0;
 }
 
@@ -177,8 +177,8 @@ int insn_and(struct proc *proc, insn_t insn)
 
 	R_getfields(insn, &rd, &rs1, &rs2);
 	mvreg(proc, rd, getreg(proc, rs1) & getreg(proc, rs2));
-	dbg_log("and: Setting x%d = x%d & x%d = 0x%lx", rd, rs1, rs2,
-		getreg(proc, rd));
+	dbg_log("and: Setting %s = %s & %s = 0x%lx", reg2abi(rd), reg2abi(rs1),
+		reg2abi(rs2), getreg(proc, rd));
 	return 0;
 }
 
@@ -190,8 +190,8 @@ int insn_or(struct proc *proc, insn_t insn)
 
 	R_getfields(insn, &rd, &rs1, &rs2);
 	mvreg(proc, rd, getreg(proc, rs1) | getreg(proc, rs2));
-	dbg_log("and: Setting x%d = x%d | x%d = 0x%lx", rd, rs1, rs2,
-		getreg(proc, rd));
+	dbg_log("and: Setting %s = %s | %s = 0x%lx", reg2abi(rd), reg2abi(rs1),
+		reg2abi(rs2), getreg(proc, rd));
 	return 0;
 }
 
@@ -203,8 +203,8 @@ int insn_xor(struct proc *proc, insn_t insn)
 
 	R_getfields(insn, &rd, &rs1, &rs2);
 	mvreg(proc, rd, getreg(proc, rs1) ^ getreg(proc, rs2));
-	dbg_log("xor: Setting x%d = x%d ^ x%d = 0x%lx", rd, rs1, rs2,
-		getreg(proc, rd));
+	dbg_log("xor: Setting %s = %s ^ %s = 0x%lx", reg2abi(rd), reg2abi(rs1),
+		reg2abi(rs2), getreg(proc, rd));
 	return 0;
 }
 
@@ -217,8 +217,8 @@ int insn_sll(struct proc *proc, insn_t insn)
 	R_getfields(insn, &rd, &rs1, &rs2);
 	mvreg(proc, rd, (reg_t)((ureg_t)getreg(proc, rs1) <<
 				(ureg_t)(getreg(proc, rs2) & 0x3f)));
-	dbg_log("sll: Setting x%d = x%d << x%d = 0x%lx", rd, rs1, rs2,
-		getreg(proc, rd));
+	dbg_log("sll: Setting %s = x%s << %s = 0x%lx", reg2abi(rd), reg2abi(rs1),
+		reg2abi(rs2), getreg(proc, rd));
 	return 0;
 }
 
@@ -231,8 +231,8 @@ int insn_srl(struct proc *proc, insn_t insn)
 	R_getfields(insn, &rd, &rs1, &rs2);
 	mvreg(proc, rd, (reg_t)((ureg_t)getreg(proc, rs1) >>
 				(ureg_t)(getreg(proc, rs2) & 0x3f)));
-	dbg_log("srl: Setting x%d = x%d >> x%d = 0x%lx", rd, rs1, rs2,
-		getreg(proc, rd));
+	dbg_log("srl: Setting %s = %s >> %s = 0x%lx", reg2abi(rd), reg2abi(rs1),
+		reg2abi(rs2), getreg(proc, rd));
 	return 0;
 }
 
@@ -245,8 +245,8 @@ int insn_sra(struct proc *proc, insn_t insn)
 	R_getfields(insn, &rd, &rs1, &rs2);
 	mvreg(proc, rd, (reg_t)((ireg_t)getreg(proc, rs1) >>
 				(ireg_t)(getreg(proc, rs2) & 0x3f)));
-	dbg_log("sra: Setting x%d = x%d >> x%d = 0x%lx", rd, rs1, rs2,
-		getreg(proc, rd));
+	dbg_log("sra: Setting %s = %s >> %s = 0x%lx", reg2abi(rd), reg2abi(rs1),
+		reg2abi(rs2), getreg(proc, rd));
 	return 0;
 }
 
@@ -258,8 +258,8 @@ int insn_sub(struct proc *proc, insn_t insn)
 
 	R_getfields(insn, &rd, &rs1, &rs2);
 	mvreg(proc, rd, getreg(proc, rs1) - getreg(proc, rs2));
-	dbg_log("sub: Setting x%d = x%d - x%d = %ld", rd, rs1, rs2,
-		getreg(proc, rd));
+	dbg_log("sub: Setting %s = %s - %s = %ld", reg2abi(rd), reg2abi(rs1),
+		reg2abi(rs2), getreg(proc, rd));
 	return 0;
 }
 
@@ -272,7 +272,8 @@ int insn_addw(struct proc *proc, insn_t insn)
 	R_getfields(insn, &rd, &rs1, &rs2);
 	mvreg(proc, rd, extend32to64((uint32_t)(getreg(proc, rs1) +
 					    getreg(proc, rs2))));
-	dbg_log("addw: setting x%d = x%d + x%d", rd, rs1, rs2);
+	dbg_log("addw: setting %s = %s + %s", reg2abi(rd), reg2abi(rs1),
+		reg2abi(rs2));
 	return 0;
 }
 
@@ -285,7 +286,8 @@ int insn_subw(struct proc *proc, insn_t insn)
 	R_getfields(insn, &rd, &rs1, &rs2);
 	mvreg(proc, rd, extend32to64((uint32_t)(getreg(proc, rs1) -
 					    getreg(proc, rs2))));
-	dbg_log("addw: setting x%d = x%d - x%d", rd, rs1, rs2);
+	dbg_log("addw: setting %s = %s - %s", reg2abi(rd), reg2abi(rs1),
+		reg2abi(rs2));
 	return 0;
 }
 
@@ -298,7 +300,8 @@ int insn_sllw(struct proc *proc, insn_t insn)
 	R_getfields(insn, &rd, &rs1, &rs2);
 	mvreg(proc, rd, extend32to64((uint32_t)((ureg_t) getreg(proc, rs1) <<
 					    (ureg_t)(getreg(proc, rs2) & 0x1f))));
-	dbg_log("addw: setting x%d = x%d << x%d", rd, rs1, rs2);
+	dbg_log("addw: setting %s = %s << %s", reg2abi(rd), reg2abi(rs1),
+		reg2abi(rs2));
 	return 0;
 }
 
@@ -311,7 +314,8 @@ int insn_srlw(struct proc *proc, insn_t insn)
 	R_getfields(insn, &rd, &rs1, &rs2);
 	mvreg(proc, rd, extend32to64((uint32_t)((ureg_t) getreg(proc, rs1) >>
 					    (ureg_t)(getreg(proc, rs2) & 0x1f))));
-	dbg_log("addw: setting x%d = x%d >> x%d", rd, rs1, rs2);
+	dbg_log("addw: setting %s = %s >> %s", reg2abi(rd), reg2abi(rs1),
+		reg2abi(rs2));
 	return 0;
 }
 
@@ -324,7 +328,8 @@ int insn_sraw(struct proc *proc, insn_t insn)
 	R_getfields(insn, &rd, &rs1, &rs2);
 	mvreg(proc, rd, extend32to64((uint32_t)((ireg_t) getreg(proc, rs1) >>
 					    (ireg_t)(getreg(proc, rs2) & 0x1f))));
-	dbg_log("sraw: setting x%d = x%d >> x%d", rd, rs1, rs2);
+	dbg_log("sraw: setting %s = %s >> %s", reg2abi(rd), reg2abi(rs1),
+		reg2abi(rs2));
 	return 0;
 }
 
@@ -336,7 +341,7 @@ int insn_andi(struct proc *proc, insn_t insn)
 
 	I_getfields(insn, &rd, &rs1, &imm);
 	mvreg(proc, rd, (reg_t)(getreg(proc, rs1) & imm));
-	dbg_log("andi: Setting x%d = x%d & 0x%lx", rd, rs1, imm);
+	dbg_log("andi: Setting %s = %s & 0x%lx", reg2abi(rd), reg2abi(rs1), imm);
 	return 0;
 }
 
@@ -348,7 +353,7 @@ int insn_ori(struct proc *proc, insn_t insn)
 
 	I_getfields(insn, &rd, &rs1, &imm);
 	mvreg(proc, rd, (reg_t)(getreg(proc, rs1) | imm));
-	dbg_log("ori: Setting x%d = x%d | 0x%lx", rd, rs1, imm);
+	dbg_log("ori: Setting %s = %s | 0x%lx", reg2abi(rd), reg2abi(rs1), imm);
 	return 0;
 }
 
@@ -360,7 +365,7 @@ int insn_xori(struct proc *proc, insn_t insn)
 
 	I_getfields(insn, &rd, &rs1, &imm);
 	mvreg(proc, rd, (reg_t)(getreg(proc, rs1) ^ imm));
-	dbg_log("xori: Setting x%d = x%d ^ 0x%lx", rd, rs1, imm);
+	dbg_log("xori: Setting %s = %s ^ 0x%lx", reg2abi(rd), reg2abi(rs1), imm);
 	return 0;
 }
 
@@ -372,7 +377,8 @@ int insn_addi(struct proc *proc, insn_t insn)
 
 	I_getfields(insn, &rd, &rs1, &imm);
 	mvreg(proc, rd, (reg_t)((uint64_t)getreg(proc, rs1) + imm));
-	dbg_log("addi: Setting x%d = x%d + %ld", rd, rs1, (int64_t)imm);
+	dbg_log("addi: Setting %s = %s + %ld", reg2abi(rd), reg2abi(rs1),
+		(int64_t)imm);
 	return 0;
 }
 
@@ -384,7 +390,8 @@ int insn_slli(struct proc *proc, insn_t insn)
 
 	I_getfields(insn, &rd, &rs1, &imm);
 	mvreg(proc, rd, (reg_t)((uint64_t)getreg(proc, rs1) << (imm & 0x3f)));
-	dbg_log("slli: Setting x%d = x%d << %d", rd, rs1, (int)(imm & 0x3f));
+	dbg_log("slli: Setting %s = %s << %d", reg2abi(rd), reg2abi(rs1),
+		(int)(imm & 0x3f));
 	return 0;
 }
 
@@ -396,7 +403,8 @@ int insn_srli(struct proc *proc, insn_t insn)
 
 	I_getfields(insn, &rd, &rs1, &imm);
 	mvreg(proc, rd, (reg_t)((uint64_t)getreg(proc, rs1) >> (imm & 0x3f)));
-	dbg_log("srli: Setting x%d = x%d >> %d", rd, rs1, (int)(imm & 0x3f));
+	dbg_log("srli: Setting %s = %s >> %d", reg2abi(rd), reg2abi(rs1),
+		(int)(imm & 0x3f));
 	return 0;
 }
 
@@ -409,7 +417,8 @@ int insn_srai(struct proc *proc, insn_t insn)
 	I_getfields(insn, &rd, &rs1, &imm);
 	mvreg(proc, rd, (reg_t)((int64_t)getreg(proc, rs1) >>
 				(int64_t)(imm & 0x3f)));
-	dbg_log("srai: Setting x%d = x%d >> %d", rd, rs1, (int)(imm & 0x3f));
+	dbg_log("srai: Setting %s = %s >> %d", reg2abi(rd), reg2abi(rs1),
+		(int)(imm & 0x3f));
 	return 0;
 }
 
@@ -421,7 +430,8 @@ int insn_slti(struct proc *proc, insn_t insn)
 
 	I_getfields(insn, &rd, &rs1, &imm);
 	mvreg(proc, rd, (reg_t)((ireg_t)getreg(proc, rs1) < (ireg_t)imm));
-	dbg_log("slti: Setting x%d = x%d < %ld", rd, rs1, (int64_t)imm);
+	dbg_log("slti: Setting %s = %s < %ld", reg2abi(rd), reg2abi(rs1),
+		(int64_t)imm);
 	return 0;
 }
 
@@ -433,7 +443,7 @@ int insn_sltiu(struct proc *proc, insn_t insn)
 
 	I_getfields(insn, &rd, &rs1, &imm);
 	mvreg(proc, rd, (reg_t)((ureg_t)getreg(proc, rs1) < (ureg_t)imm));
-	dbg_log("sltiu: Setting x%d = x%d < %lu", rd, rs1, imm);
+	dbg_log("sltiu: Setting %s = %s < %lu", reg2abi(rd), reg2abi(rs1), imm);
 	return 0;
 }
 
@@ -445,7 +455,8 @@ int insn_addiw(struct proc *proc, insn_t insn)
 
 	I_getfields(insn, &rd, &rs1, &imm);
 	mvreg(proc, rd, (reg_t)extend32to64((uint32_t)(getreg(proc, rd) + imm)));
-	dbg_log("addiw: x%d = x%d + %d", rd, rs1, (int32_t)imm);
+	dbg_log("addiw: %s = %s + %d", reg2abi(rd), reg2abi(rs1),
+		(int32_t)imm);
 	return 0;
 }
 
@@ -458,7 +469,8 @@ int insn_slliw(struct proc *proc, insn_t insn)
 	I_getfields(insn, &rd, &rs1, &imm);
 	mvreg(proc, rd, (reg_t)extend32to64((uint32_t)(getreg(proc, rd) <<
 						   (imm & 0x1f))));
-	dbg_log("slliw: x%d = x%d << %u", rd, rs1, (unsigned)(imm & 0x1f));
+	dbg_log("slliw: %s = %s << %u", reg2abi(rd), reg2abi(rs1),
+		(unsigned)(imm & 0x1f));
 	return 0;
 }
 
@@ -471,7 +483,8 @@ int insn_srliw(struct proc *proc, insn_t insn)
 	I_getfields(insn, &rd, &rs1, &imm);
 	mvreg(proc, rd, (reg_t)extend32to64((uint32_t)(getreg(proc, rd) >>
 						   (imm & 0x1f))));
-	dbg_log("srliw: x%d = x%d >> %u", rd, rs1, (unsigned)(imm & 0x1f));
+	dbg_log("srliw: %s = %s >> %u", reg2abi(rd), reg2abi(rs1),
+		(unsigned)(imm & 0x1f));
 	return 0;
 }
 
@@ -484,7 +497,8 @@ int insn_sraiw(struct proc *proc, insn_t insn)
 	I_getfields(insn, &rd, &rs1, &imm);
 	mvreg(proc, rd, (reg_t)extend32to64((uint32_t)((int32_t)(getreg(proc, rd)
 						  >> (int32_t)(imm & 0x1f)))));
-	dbg_log("sraiw: x%d = x%d >> %u", rd, rs1, (unsigned)(imm & 0x1f));
+	dbg_log("sraiw: %s = %s >> %u", reg2abi(rd), reg2abi(rs1),
+		(unsigned)(imm & 0x1f));
 	return 0;
 }
 
@@ -495,7 +509,7 @@ int insn_lui(struct proc *proc, insn_t insn)
 
 	U_getfields(insn, &rd, &imm);
 	mvreg(proc, rd, (reg_t)imm);
-	dbg_log("lui: Setting x%d = %ld", rd, imm);
+	dbg_log("lui: Setting %s = %ld", reg2abi(rd), imm);
 	return 0;
 }
 
@@ -506,7 +520,7 @@ int insn_auipc(struct proc *proc, insn_t insn)
 
 	U_getfields(insn, &rd, &imm);
 	mvreg(proc, rd, (reg_t)(proc->pc + imm));
-	dbg_log("auipc: x%d = 0x%lx + 0x%lx", rd, proc->pc, imm);
+	dbg_log("auipc: %s = 0x%lx + 0x%lx", reg2abi(rd), proc->pc, imm);
 	return 0;
 }
 
@@ -517,7 +531,7 @@ int insn_jal(struct proc *proc, insn_t insn)
 
 	J_getfields(insn, &rd, &imm);
 	mvreg(proc, rd, (reg_t)(proc->pc + 4));
-	dbg_log("jal: x%d = 0x%lx . pc += 0x%lx", rd, getreg(proc, rd), imm);
+	dbg_log("jal: %s = 0x%lx . pc += 0x%lx", reg2abi(rd), getreg(proc, rd), imm);
 	proc->pc += imm - 4; // Cycle always adds size of current instruction
 	if (proc->pc % IALIGN != 0) {
 		err_log("pc (0x%lx) is not bit-aligned to IALIGN (%u)",
@@ -535,8 +549,8 @@ int insn_jalr(struct proc *proc, insn_t insn)
 
 	I_getfields(insn, &rd, &rs1, &imm);
 	mvreg(proc, rd, (reg_t)(proc->pc + 4));
-	dbg_log("jalr: x%d = 0x%lx. pc = x%d (0x%lx) + 0x%lx", rd,
-		getreg(proc, rd), rs1, getreg(proc, rs1), imm);
+	dbg_log("jalr: %s = 0x%lx. pc = %s (0x%lx) + 0x%lx", reg2abi(rd),
+		getreg(proc, rd), reg2abi(rs1), getreg(proc, rs1), imm);
 
 	// Cycle always adds size of current instruction
 	proc->pc = (rvaddr_t)(getreg(proc, rs1) + imm - 4);
@@ -555,8 +569,9 @@ int insn_beq(struct proc *proc, insn_t insn)
 	uint64_t imm;
 
 	B_getfields(insn, &rs1, &rs2, &imm);
-	dbg_log("beq: Comparing x%d (0x%lx) to x%d (0x%lx), pc: 0x%lx, offset: 0x%lx",
-		rs1, getreg(proc, rs1), rs2, getreg(proc, rs2), proc->pc, imm);
+	dbg_log("beq: Comparing %s (0x%lx) to %s (0x%lx), pc: 0x%lx, offset: 0x%lx",
+		reg2abi(rs1), getreg(proc, rs1), reg2abi(rs2), getreg(proc, rs2),
+		proc->pc, imm);
 
 	if (getreg(proc, rs1) == getreg(proc, rs2)) {
 		// Cycle always adds size of current instruction
@@ -578,8 +593,9 @@ int insn_bne(struct proc *proc, insn_t insn)
 	uint64_t imm;
 
 	B_getfields(insn, &rs1, &rs2, &imm);
-	dbg_log("bne: Comparing x%d (0x%lx) to x%d (0x%lx), pc: 0x%lx, offset: 0x%lx",
-		rs1, getreg(proc, rs1), rs2, getreg(proc, rs2), proc->pc, imm);
+	dbg_log("bne: Comparing %s (0x%lx) to %s (0x%lx), pc: 0x%lx, offset: 0x%lx",
+		reg2abi(rs1), getreg(proc, rs1), reg2abi(rs2), getreg(proc, rs2),
+		proc->pc, imm);
 
 	if (getreg(proc, rs1) != getreg(proc, rs2)) {
 		// Cycle always adds size of current instruction
@@ -601,8 +617,9 @@ int insn_blt(struct proc *proc, insn_t insn)
 	uint64_t imm;
 
 	B_getfields(insn, &rs1, &rs2, &imm);
-	dbg_log("blt: Comparing x%d (0x%lx) to x%d (0x%lx), pc: 0x%lx, offset: 0x%lx",
-		rs1, getreg(proc, rs1), rs2, getreg(proc, rs2), proc->pc, imm);
+	dbg_log("blt: Comparing %s (0x%lx) to %s (0x%lx), pc: 0x%lx, offset: 0x%lx",
+		reg2abi(rs1), getreg(proc, rs1), reg2abi(rs2), getreg(proc, rs2),
+		proc->pc, imm);
 
 	if ((ireg_t)getreg(proc, rs1) < (ireg_t)getreg(proc, rs2)) {
 		// Cycle always adds size of current instruction
@@ -624,8 +641,9 @@ int insn_bltu(struct proc *proc, insn_t insn)
 	uint64_t imm;
 
 	B_getfields(insn, &rs1, &rs2, &imm);
-	dbg_log("bltu: Comparing x%d (0x%lx) to x%d (0x%lx), pc: 0x%lx, offset: 0x%lx",
-		rs1, getreg(proc, rs1), rs2, getreg(proc, rs2), proc->pc, imm);
+	dbg_log("bltu: Comparing %s (0x%lx) to %s (0x%lx), pc: 0x%lx, offset: 0x%lx",
+		reg2abi(rs1), getreg(proc, rs1), reg2abi(rs2), getreg(proc, rs2),
+		proc->pc, imm);
 
 	if ((ureg_t)getreg(proc, rs1) < (ureg_t)getreg(proc, rs2)) {
 		// Cycle always adds size of current instruction
@@ -647,8 +665,9 @@ int insn_bge(struct proc *proc, insn_t insn)
 	uint64_t imm;
 
 	B_getfields(insn, &rs1, &rs2, &imm);
-	dbg_log("bge: Comparing x%d (0x%lx) to x%d (0x%lx), pc: 0x%lx, offset: 0x%lx",
-		rs1, getreg(proc, rs1), rs2, getreg(proc, rs2), proc->pc, imm);
+	dbg_log("bge: Comparing %s (0x%lx) to %s (0x%lx), pc: 0x%lx, offset: 0x%lx",
+		reg2abi(rs1), getreg(proc, rs1), reg2abi(rs2), getreg(proc, rs2),
+		proc->pc, imm);
 
 	if ((ireg_t)getreg(proc, rs1) > (ireg_t)getreg(proc, rs2)) {
 		// Cycle always adds size of current instruction
@@ -670,8 +689,9 @@ int insn_bgeu(struct proc *proc, insn_t insn)
 	uint64_t imm;
 
 	B_getfields(insn, &rs1, &rs2, &imm);
-	dbg_log("bgeu: Comparing x%d (0x%lx) to x%d (0x%lx), pc: 0x%lx, offset: 0x%lx",
-		rs1, getreg(proc, rs1), rs2, getreg(proc, rs2), proc->pc, imm);
+	dbg_log("bgeu: Comparing %s (0x%lx) to %s (0x%lx), pc: 0x%lx, offset: 0x%lx",
+		reg2abi(rs1), getreg(proc, rs1), reg2abi(rs2), getreg(proc, rs2),
+		proc->pc, imm);
 
 	if ((ureg_t)getreg(proc, rs1) > (ureg_t)getreg(proc, rs2)) {
 		// Cycle always adds size of current instruction
@@ -700,8 +720,8 @@ int insn_lb(struct proc *proc, insn_t insn)
 		return -1;
 	}
 
-	dbg_log("lb: Loading %hhd from 0x%lx into x%d", (int8_t)val,
-		getreg(proc, rs1) + imm, rd);
+	dbg_log("lb: Loading %hhd from 0x%lx into %s", (int8_t)val,
+		getreg(proc, rs1) + imm, reg2abi(rd));
 	mvreg(proc, rd, (reg_t)extend8to64(val));
 	return 0;
 }
@@ -720,8 +740,8 @@ int insn_lh(struct proc *proc, insn_t insn)
 		return -1;
 	}
 
-	dbg_log("lh: Loading %hd from 0x%lx into x%d", (int16_t)val,
-		getreg(proc, rs1) + imm, rd);
+	dbg_log("lh: Loading %hd from 0x%lx into %s", (int16_t)val,
+		getreg(proc, rs1) + imm, reg2abi(rd));
 	mvreg(proc, rd, (reg_t)extend16to64(val));
 	return 0;
 }
@@ -740,8 +760,8 @@ int insn_lw(struct proc *proc, insn_t insn)
 		return -1;
 	}
 
-	dbg_log("lw: Loading %d from 0x%lx into x%d", (int32_t)val,
-		getreg(proc, rs1) + imm, rd);
+	dbg_log("lw: Loading %d from 0x%lx into %s", (int32_t)val,
+		getreg(proc, rs1) + imm, reg2abi(rd));
 	mvreg(proc, rd, (reg_t)extend32to64(val));
 	return 0;
 }
@@ -760,8 +780,8 @@ int insn_ld(struct proc *proc, insn_t insn)
 		return -1;
 	}
 
-	dbg_log("ld: Loading %ld from 0x%lx into x%d", (int64_t)val,
-		getreg(proc, rs1) + imm, rd);
+	dbg_log("ld: Loading %ld from 0x%lx into %s", (int64_t)val,
+		getreg(proc, rs1) + imm, reg2abi(rd));
 	mvreg(proc, rd, (reg_t)val);
 	return 0;
 }
@@ -780,8 +800,8 @@ int insn_lwu(struct proc *proc, insn_t insn)
 		return -1;
 	}
 
-	dbg_log("lwu: Loading %u from 0x%lx into x%d", val,
-		getreg(proc, rs1) + imm, rd);
+	dbg_log("lwu: Loading %u from 0x%lx into %s", val,
+		getreg(proc, rs1) + imm, reg2abi(rd));
 	mvreg(proc, rd, (reg_t)zextend32to64(val));
 	return 0;
 }
@@ -800,8 +820,8 @@ int insn_lhu(struct proc *proc, insn_t insn)
 		return -1;
 	}
 
-	dbg_log("lhu: Loading %hu from 0x%lx into x%d", val,
-		getreg(proc, rs1) + imm, rd);
+	dbg_log("lhu: Loading %hu from 0x%lx into %s", val,
+		getreg(proc, rs1) + imm, reg2abi(rd));
 	mvreg(proc, rd, (reg_t)zextend16to64(val));
 	return 0;
 }
@@ -820,8 +840,8 @@ int insn_lbu(struct proc *proc, insn_t insn)
 		return -1;
 	}
 
-	dbg_log("lbu: Loading %hhu from 0x%lx into x%d", val,
-		getreg(proc, rs1) + imm, rd);
+	dbg_log("lbu: Loading %hhu from 0x%lx into %s", val,
+		getreg(proc, rs1) + imm, reg2abi(rd));
 	mvreg(proc, rd, (reg_t)zextend8to64(val));
 	return 0;
 }
@@ -836,7 +856,7 @@ int insn_sb(struct proc *proc, insn_t insn)
 	S_getfields(insn, &rs1, &rs2, &imm);
 	val = (uint8_t)(getreg(proc, rs2) & 0xff);
 
-	dbg_log("sb: Storing %hhu from x%d into 0x%lx", val, rs2,
+	dbg_log("sb: Storing %hhu from %s into 0x%lx", val, reg2abi(rs2),
 		getreg(proc, rs1) + imm);
 	if (memstore(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1) {
 		err_log("sb: Could not store address 0x%lx: %s",
@@ -857,7 +877,7 @@ int insn_sh(struct proc *proc, insn_t insn)
 	S_getfields(insn, &rs1, &rs2, &imm);
 	val = (uint16_t)(getreg(proc, rs2) & 0xffff);
 
-	dbg_log("sh: Storing %hu from x%d into 0x%lx", val, rs2,
+	dbg_log("sh: Storing %hu from %s into 0x%lx", val, reg2abi(rs2),
 		getreg(proc, rs1) + imm);
 	if (memstore(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1) {
 		err_log("sh: Could not store address 0x%lx: %s",
@@ -878,7 +898,7 @@ int insn_sw(struct proc *proc, insn_t insn)
 	S_getfields(insn, &rs1, &rs2, &imm);
 	val = (uint32_t)(getreg(proc, rs2) & 0xffffffff);
 
-	dbg_log("sw: Storing %u from x%d into 0x%lx", val, rs2,
+	dbg_log("sw: Storing %u from %s into 0x%lx", val, reg2abi(rs2),
 		getreg(proc, rs1) + imm);
 	if (memstore(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1) {
 		err_log("sw: Could not store address 0x%lx: %s",
@@ -899,7 +919,7 @@ int insn_sd(struct proc *proc, insn_t insn)
 	S_getfields(insn, &rs1, &rs2, &imm);
 	val = (uint64_t)getreg(proc, rs2);
 
-	dbg_log("sd: Storing %lu from x%d into 0x%lx", val, rs2,
+	dbg_log("sd: Storing %lu from %s into 0x%lx", val, reg2abi(rs2),
 		getreg(proc, rs1) + imm);
 	if (memstore(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1) {
 		err_log("sd: Could not store address 0x%lx: %s",

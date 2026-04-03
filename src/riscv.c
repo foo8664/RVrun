@@ -1,3 +1,10 @@
+/* SPDX-License-Identifier: GPL-2.0-only */
+/*
+ * RISC-V related operations.
+ *
+ *  Copyright (C) 2026 by Diego Oliveira <di.diegoevaristo@gmail.com>
+ */
+#include <assert.h>
 #include "riscv.h"
 
 static const char *abi_reg[32] = {
@@ -37,5 +44,6 @@ static const char *abi_reg[32] = {
 
 const char *reg2abi(enum ABI_REG r)
 {
+	assert(r >= 0 && r < 32);
 	return abi_reg[r];
 }

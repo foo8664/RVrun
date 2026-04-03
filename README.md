@@ -6,10 +6,7 @@
 
 ## Currently supported:
 ### Extensions
- * Rv64I (partly)
-   * I-type instructions
-   * R-type instructions
-   * U-type instructions
+ * Rv64I (Base ISA)
 ### System calls
  * openat       (syscall num: 56)
  * close        (syscall num: 57)
