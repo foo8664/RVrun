@@ -2,7 +2,7 @@
 /*
  * Main file, loads, executes, and exits
  *
- *  Copyright (C) 2026 by Diego Oliveira Evaristo <di.diegoevaristo@gmail.com>
+ *  Copyright (C) 2026 by Diego Oliveira <di.diegoevaristo@gmail.com>
  */
 
 #include <errno.h>

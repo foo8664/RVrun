@@ -2,7 +2,7 @@
 /*
  * Runtime config, parses argv.
  *
- *  Copyright (C) 2026 by Diego Oliveira Evaristo <di.diegoevaristo@gmail.com>
+ *  Copyright (C) 2026 by Diego Oliveira <di.diegoevaristo@gmail.com>
  */
 
 #ifndef RISCV_CONFIG_H

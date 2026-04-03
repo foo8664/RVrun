@@ -2,7 +2,7 @@
 /*
  * Rv64I instructions
  *
- *  Copyright (C) 2026 by Diego Oliveira Evaristo <di.diegoevaristo@gmail.com>
+ *  Copyright (C) 2026 by Diego Oliveira <di.diegoevaristo@gmail.com>
  */
 
 #ifndef RISCV_RV64I_H
@@ -61,5 +61,15 @@ int insn_blt(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_bltu(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_bge(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_bgeu(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+
+// Store/Load Instructions
+int insn_lb(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_lh(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_lw(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_lbu(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_lhu(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_lwu(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_ld(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+
 
 #endif // RISCV_RV64I_H

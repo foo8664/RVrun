@@ -2,7 +2,7 @@
 /*
  * Instruction fetching and decoding
  *
- *  Copyright (C) 2026 by Diego Oliveira Evaristo <di.diegoevaristo@gmail.com>
+ *  Copyright (C) 2026 by Diego Oliveira <di.diegoevaristo@gmail.com>
  */
 
 #include <errno.h>
@@ -82,6 +82,15 @@ int (*insn_decode(insn_t insn))(struct proc *, insn_t)
 	ADD_INSN(BLTU,	insn_bltu);
 	ADD_INSN(BGE,	insn_bge);
 	ADD_INSN(BGEU,	insn_bgeu);
+
+	// Load/Store:
+	ADD_INSN(LB,	insn_lb);
+	ADD_INSN(LH,	insn_lh);
+	ADD_INSN(LW,	insn_lw);
+	ADD_INSN(LD,	insn_ld);
+	ADD_INSN(LBU,	insn_lbu);
+	ADD_INSN(LHU,	insn_lhu);
+	ADD_INSN(LWU,	insn_lwu);
 
 	errno = ENOSYS;
 	return NULL;

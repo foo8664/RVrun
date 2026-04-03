@@ -2,20 +2,24 @@
 /*
  * Rv64I instructions
  *
- *  Copyright (C) 2026 by Diego Oliveira Evaristo <di.diegoevaristo@gmail.com>
+ *  Copyright (C) 2026 by Diego Oliveira <di.diegoevaristo@gmail.com>
  */
 
 #include <errno.h>
+#include <string.h>
 #include <stdint.h>
 #include "riscv.h"
 #include "proc.h"
 #include "debug.h"
 #include "rv_i.h"
 
+#include "memory.h"
+
 // For ecall
 #include "syscall.h"
 #include "sysnums.h"
 
+// Get info from OP-Code fields
 static inline void R_getfields(insn_t insn, enum ABI_REG *rd, enum ABI_REG *rs1,
 			       enum ABI_REG *rs2) __attribute__((nonnull));
 static inline void I_getfields(insn_t insn, enum ABI_REG *rd, enum ABI_REG *rs1,
@@ -27,7 +31,13 @@ static inline void J_getfields(insn_t insn, enum ABI_REG *rd, uint64_t *imm)
 static inline void B_getfields(insn_t insn, enum ABI_REG *rs1, enum ABI_REG *rs2,
 			       uint64_t *imm)	__attribute__((nonnull));
 
-static inline uint64_t extend64(uint32_t i32) __attribute__((nonnull));
+// Sign-extend/Zero-extend values
+static inline uint64_t extend32to64(uint32_t i32);
+static inline uint64_t extend16to64(uint16_t i16);
+static inline uint64_t extend8to64(uint8_t i8);
+static inline uint64_t zextend32to64(uint32_t i32);
+static inline uint64_t zextend16to64(uint16_t i16);
+static inline uint64_t zextend8to64(uint8_t i8);
 
 
 static inline void R_getfields(insn_t insn, enum ABI_REG *rd, enum ABI_REG *rs1,
@@ -76,9 +86,34 @@ static inline void B_getfields(insn_t insn, enum ABI_REG *rs1, enum ABI_REG *rs2
 }
 
 
-static inline uint64_t extend64(uint32_t i32)
+static inline uint64_t extend32to64(uint32_t i32)
 {
 	return i32 & 0x80000000 ? (uint64_t)i32 | (~0lu << 32) : i32;
+}
+
+static inline uint64_t extend16to64(uint16_t i16)
+{
+	return i16 & 0x8000 ? (uint64_t)i16 | (~0lu << 16) : i16;
+}
+
+static inline uint64_t extend8to64(uint8_t i8)
+{
+	return i8 & 0x80 ? (uint64_t)i8 | (~0lu << 8) : i8;
+}
+
+static inline uint64_t zextend32to64(uint32_t u32)
+{
+	return (uint64_t)u32;
+}
+
+static inline uint64_t zextend16to64(uint16_t u16)
+{
+	return (uint64_t)u16;
+}
+
+static inline uint64_t zextend8to64(uint8_t u8)
+{
+	return (uint64_t)u8;
 }
 
 
@@ -222,7 +257,7 @@ int insn_addw(struct proc *proc, insn_t insn)
 	enum ABI_REG rs2;
 
 	R_getfields(insn, &rd, &rs1, &rs2);
-	mvreg(proc, rd, extend64((uint32_t)(getreg(proc, rs1) +
+	mvreg(proc, rd, extend32to64((uint32_t)(getreg(proc, rs1) +
 					    getreg(proc, rs2))));
 	dbg_log("addw: setting x%d = x%d + x%d", rd, rs1, rs2);
 	return 0;
@@ -235,7 +270,7 @@ int insn_subw(struct proc *proc, insn_t insn)
 	enum ABI_REG rs2;
 
 	R_getfields(insn, &rd, &rs1, &rs2);
-	mvreg(proc, rd, extend64((uint32_t)(getreg(proc, rs1) -
+	mvreg(proc, rd, extend32to64((uint32_t)(getreg(proc, rs1) -
 					    getreg(proc, rs2))));
 	dbg_log("addw: setting x%d = x%d - x%d", rd, rs1, rs2);
 	return 0;
@@ -248,7 +283,7 @@ int insn_sllw(struct proc *proc, insn_t insn)
 	enum ABI_REG rs2;
 
 	R_getfields(insn, &rd, &rs1, &rs2);
-	mvreg(proc, rd, extend64((uint32_t)((ureg_t) getreg(proc, rs1) <<
+	mvreg(proc, rd, extend32to64((uint32_t)((ureg_t) getreg(proc, rs1) <<
 					    (ureg_t)(getreg(proc, rs2) & 0x1f))));
 	dbg_log("addw: setting x%d = x%d << x%d", rd, rs1, rs2);
 	return 0;
@@ -261,7 +296,7 @@ int insn_srlw(struct proc *proc, insn_t insn)
 	enum ABI_REG rs2;
 
 	R_getfields(insn, &rd, &rs1, &rs2);
-	mvreg(proc, rd, extend64((uint32_t)((ureg_t) getreg(proc, rs1) >>
+	mvreg(proc, rd, extend32to64((uint32_t)((ureg_t) getreg(proc, rs1) >>
 					    (ureg_t)(getreg(proc, rs2) & 0x1f))));
 	dbg_log("addw: setting x%d = x%d >> x%d", rd, rs1, rs2);
 	return 0;
@@ -274,7 +309,7 @@ int insn_sraw(struct proc *proc, insn_t insn)
 	enum ABI_REG rs2;
 
 	R_getfields(insn, &rd, &rs1, &rs2);
-	mvreg(proc, rd, extend64((uint32_t)((ireg_t) getreg(proc, rs1) >>
+	mvreg(proc, rd, extend32to64((uint32_t)((ireg_t) getreg(proc, rs1) >>
 					    (ireg_t)(getreg(proc, rs2) & 0x1f))));
 	dbg_log("sraw: setting x%d = x%d >> x%d", rd, rs1, rs2);
 	return 0;
@@ -396,7 +431,7 @@ int insn_addiw(struct proc *proc, insn_t insn)
 	uint64_t imm;
 
 	I_getfields(insn, &rd, &rs1, &imm);
-	mvreg(proc, rd, (reg_t)extend64((uint32_t)(getreg(proc, rd) + imm)));
+	mvreg(proc, rd, (reg_t)extend32to64((uint32_t)(getreg(proc, rd) + imm)));
 	dbg_log("addiw: x%d = x%d + %d", rd, rs1, (int32_t)imm);
 	return 0;
 }
@@ -408,7 +443,7 @@ int insn_slliw(struct proc *proc, insn_t insn)
 	uint64_t imm;
 
 	I_getfields(insn, &rd, &rs1, &imm);
-	mvreg(proc, rd, (reg_t)extend64((uint32_t)(getreg(proc, rd) <<
+	mvreg(proc, rd, (reg_t)extend32to64((uint32_t)(getreg(proc, rd) <<
 						   (imm & 0x1f))));
 	dbg_log("slliw: x%d = x%d << %u", rd, rs1, (unsigned)(imm & 0x1f));
 	return 0;
@@ -421,7 +456,7 @@ int insn_srliw(struct proc *proc, insn_t insn)
 	uint64_t imm;
 
 	I_getfields(insn, &rd, &rs1, &imm);
-	mvreg(proc, rd, (reg_t)extend64((uint32_t)(getreg(proc, rd) >>
+	mvreg(proc, rd, (reg_t)extend32to64((uint32_t)(getreg(proc, rd) >>
 						   (imm & 0x1f))));
 	dbg_log("srliw: x%d = x%d >> %u", rd, rs1, (unsigned)(imm & 0x1f));
 	return 0;
@@ -434,7 +469,7 @@ int insn_sraiw(struct proc *proc, insn_t insn)
 	uint64_t imm;
 
 	I_getfields(insn, &rd, &rs1, &imm);
-	mvreg(proc, rd, (reg_t)extend64((uint32_t)((int32_t)(getreg(proc, rd)
+	mvreg(proc, rd, (reg_t)extend32to64((uint32_t)((int32_t)(getreg(proc, rd)
 						  >> (int32_t)(imm & 0x1f)))));
 	dbg_log("sraiw: x%d = x%d >> %u", rd, rs1, (unsigned)(imm & 0x1f));
 	return 0;
@@ -635,6 +670,146 @@ int insn_bgeu(struct proc *proc, insn_t insn)
 		}
 	}
 
+	return 0;
+}
+
+int insn_lb(struct proc *proc, insn_t insn)
+{
+	enum ABI_REG rd;
+	enum ABI_REG rs1;
+	uint64_t imm;
+	uint8_t val;
+
+	I_getfields(insn, &rd, &rs1, &imm);
+	if (memload(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1) {
+		err_log("lb: Could not load address 0x%lx: %s",
+			getreg(proc, rs1) + imm, strerror(errno));
+		return -1;
+	}
+
+	dbg_log("lb: Loading %hhd from 0x%lx into x%d", (int8_t)val,
+		getreg(proc, rs1) + imm, rs1);
+	mvreg(proc, rs1, (reg_t)extend8to64(val));
+	return 0;
+}
+
+int insn_lh(struct proc *proc, insn_t insn)
+{
+	enum ABI_REG rd;
+	enum ABI_REG rs1;
+	uint64_t imm;
+	uint16_t val;
+
+	I_getfields(insn, &rd, &rs1, &imm);
+	if (memload(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1) {
+		err_log("lh: Could not load address 0x%lx: %s",
+			getreg(proc, rs1) + imm, strerror(errno));
+		return -1;
+	}
+
+	dbg_log("lh: Loading %hd from 0x%lx into x%d", (int16_t)val,
+		getreg(proc, rs1) + imm, rs1);
+	mvreg(proc, rs1, (reg_t)extend16to64(val));
+	return 0;
+}
+
+int insn_lw(struct proc *proc, insn_t insn)
+{
+	enum ABI_REG rd;
+	enum ABI_REG rs1;
+	uint64_t imm;
+	uint32_t val;
+
+	I_getfields(insn, &rd, &rs1, &imm);
+	if (memload(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1) {
+		err_log("lw: Could not load address 0x%lx: %s",
+			getreg(proc, rs1) + imm, strerror(errno));
+		return -1;
+	}
+
+	dbg_log("lw: Loading %d from 0x%lx into x%d", (int32_t)val,
+		getreg(proc, rs1) + imm, rs1);
+	mvreg(proc, rs1, (reg_t)extend32to64(val));
+	return 0;
+}
+
+int insn_ld(struct proc *proc, insn_t insn)
+{
+	enum ABI_REG rd;
+	enum ABI_REG rs1;
+	uint64_t imm;
+	uint64_t val;
+
+	I_getfields(insn, &rd, &rs1, &imm);
+	if (memload(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1) {
+		err_log("ld: Could not load address 0x%lx: %s",
+			getreg(proc, rs1) + imm, strerror(errno));
+		return -1;
+	}
+
+	dbg_log("ld: Loading %ld from 0x%lx into x%d", (int64_t)val,
+		getreg(proc, rs1) + imm, rs1);
+	mvreg(proc, rs1, (reg_t)val);
+	return 0;
+}
+
+int insn_lwu(struct proc *proc, insn_t insn)
+{
+	enum ABI_REG rd;
+	enum ABI_REG rs1;
+	uint64_t imm;
+	uint32_t val;
+
+	I_getfields(insn, &rd, &rs1, &imm);
+	if (memload(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1) {
+		err_log("lwu: Could not load address 0x%lx: %s",
+			getreg(proc, rs1) + imm, strerror(errno));
+		return -1;
+	}
+
+	dbg_log("lwu: Loading %u from 0x%lx into x%d", val,
+		getreg(proc, rs1) + imm, rs1);
+	mvreg(proc, rs1, (reg_t)zextend32to64(val));
+	return 0;
+}
+
+int insn_lhu(struct proc *proc, insn_t insn)
+{
+	enum ABI_REG rd;
+	enum ABI_REG rs1;
+	uint64_t imm;
+	uint16_t val;
+
+	I_getfields(insn, &rd, &rs1, &imm);
+	if (memload(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1) {
+		err_log("lhu: Could not load address 0x%lx: %s",
+			getreg(proc, rs1) + imm, strerror(errno));
+		return -1;
+	}
+
+	dbg_log("lhu: Loading %hu from 0x%lx into x%d", val,
+		getreg(proc, rs1) + imm, rs1);
+	mvreg(proc, rs1, (reg_t)zextend16to64(val));
+	return 0;
+}
+
+int insn_lbu(struct proc *proc, insn_t insn)
+{
+	enum ABI_REG rd;
+	enum ABI_REG rs1;
+	uint64_t imm;
+	uint8_t val;
+
+	I_getfields(insn, &rd, &rs1, &imm);
+	if (memload(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1) {
+		err_log("lbu: Could not load address 0x%lx: %s",
+			getreg(proc, rs1) + imm, strerror(errno));
+		return -1;
+	}
+
+	dbg_log("lbu: Loading %hhu from 0x%lx into x%d", val,
+		getreg(proc, rs1) + imm, rs1);
+	mvreg(proc, rs1, (reg_t)zextend8to64(val));
 	return 0;
 }
 

@@ -2,7 +2,7 @@
 /*
  * Functions/Macros for logging and debugging
  *
- *  Copyright (C) 2026 by Diego Oliveira Evaristo <di.diegoevaristo@gmail.com>
+ *  Copyright (C) 2026 by Diego Oliveira <di.diegoevaristo@gmail.com>
  */
 
 #ifndef DEBUG_H
