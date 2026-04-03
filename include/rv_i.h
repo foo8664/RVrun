@@ -44,7 +44,6 @@ int insn_srli(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_srai(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_slti(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_sltiu(struct proc *proc, insn_t insn)	__attribute__((nonnull));
-int insn_ecall(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_addiw(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_slliw(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_srliw(struct proc *proc, insn_t insn)	__attribute__((nonnull));
@@ -75,5 +74,9 @@ int insn_sh(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_sw(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 int insn_sd(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 
+// Miscallenous
+int insn_ecall(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_ebreak(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_fence(struct proc *proc, insn_t insn)	__attribute__((nonnull));
 
 #endif // RISCV_RV64I_H

@@ -53,4 +53,6 @@ enum ABI_REG {
 	REG_T6,
 };
 
+const char *reg2abi(enum ABI_REG r) __attribute__((const, leaf));
+
 #endif // RISCV_H

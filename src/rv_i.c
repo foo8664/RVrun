@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <string.h>
 #include <stdint.h>
+#include <stdio.h>
 #include "riscv.h"
 #include "proc.h"
 #include "debug.h"
@@ -908,6 +909,33 @@ int insn_sd(struct proc *proc, insn_t insn)
 
 	return 0;
 }
+
+int insn_fence(struct proc *proc, insn_t insn)
+{
+	(void)proc;
+	(void)insn;
+
+	dbg_log("fence: NOP");
+	return 0;
+}
+
+int insn_ebreak(struct proc *proc, insn_t insn)
+{
+	int i;
+
+	(void)insn;
+
+	dbg_log("EBREAK: Dumping proc's registers:");
+	for (i = 1; i < 32; ++i) {
+		printf("%s = 0x%lx\t\t\t", reg2abi(i), (unsigned long)getreg(proc, i));
+		if ((i & 1) == 0)
+			putchar('\n');
+	}
+	putchar('\n');
+
+	return 0;
+}
+
 // Ignores rd and rs1, only implements linux system calls
 int insn_ecall(struct proc *proc, insn_t insn)
 {

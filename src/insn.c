@@ -65,7 +65,6 @@ int (*insn_decode(insn_t insn))(struct proc *, insn_t)
 	ADD_INSN(ADDI,	insn_addi);
 	ADD_INSN(SLTI,	insn_slti);
 	ADD_INSN(SLTIU,	insn_sltiu);
-	ADD_INSN(ECALL, insn_ecall);
 	ADD_INSN(ADDIW,	insn_addiw);
 	ADD_INSN(SLLIW,	insn_slliw);
 	ADD_INSN(SRLIW,	insn_srliw);
@@ -95,6 +94,11 @@ int (*insn_decode(insn_t insn))(struct proc *, insn_t)
 	ADD_INSN(SH,	insn_sh);
 	ADD_INSN(SW,	insn_sw);
 	ADD_INSN(SD,	insn_sd);
+
+	// Miscallenous:
+	ADD_INSN(ECALL, insn_ecall);
+	ADD_INSN(EBREAK,insn_ebreak);
+	ADD_INSN(FENCE, insn_fence);
 
 	errno = ENOSYS;
 	return NULL;
