@@ -52,9 +52,9 @@ openat:
 .globl open
 .type open, @function
 open:
-	mv a1, a0
-	mv a2, a1
 	mv a3, a2
+	mv a2, a1
+	mv a1, a0
 	li a0, -100 # AT_FDCWD
 	li a7, 56
 	ecall
