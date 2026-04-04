@@ -41,7 +41,7 @@ struct memseg *addseg(struct memory *mem, rvaddr_t start, rvaddr_t end,
 		return NULL;
 	if (!(seg = malloc(sizeof(*seg))))
 		return NULL;
-	if (!(seg->mem = malloc(end - start - 1))) {
+	if (!(seg->mem = calloc(end - start - 1, 1))) {
 		free(seg);
 		return NULL;
 	}
