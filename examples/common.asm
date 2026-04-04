@@ -74,6 +74,13 @@ write:
 	ecall
 	ret
 
+.type close, @function
+.globl close
+close:
+	li a7, 57
+	ecall
+	ret
+
 .type exit, @function
 .globl exit
 exit:
