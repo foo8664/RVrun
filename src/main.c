@@ -109,7 +109,7 @@ static void setcfg(int argc, char **argv)
 	}};
 
 	static struct rvconfig cfg = {
-		.optstring = "",
+		.optstring = "+",
 		.size = 5,
 		.opts = opts,
 	};
