@@ -531,7 +531,7 @@ int insn_jal(struct proc *proc, insn_t insn)
 
 	J_getfields(insn, &rd, &imm);
 	mvreg(proc, rd, (reg_t)(proc->pc + 4));
-	dbg_log("jal: %s = 0x%lx . pc += 0x%lx", reg2abi(rd), getreg(proc, rd), imm);
+	dbg_log("jal: %s = 0x%lx, pc += 0x%lx", reg2abi(rd), getreg(proc, rd), imm);
 	proc->pc += imm - 4; // Cycle always adds size of current instruction
 	if (proc->pc % IALIGN != 0) {
 		err_log("pc (0x%lx) is not bit-aligned to IALIGN (%u)",

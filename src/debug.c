@@ -99,5 +99,6 @@ void rvrunpanic(const char *restrict file, const char *restrict func, int line,
 		const char *restrict reason)
 {
 	fprintf(logfile, "[PANIC]: %s:%s():%d: %s\n", file, func, line, reason);
+	fflush(logfile);
 	abort();
 }

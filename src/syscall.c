@@ -43,7 +43,7 @@ int rvsys_write(struct proc *proc)
 	int fd;
 
 	if (proc->regs[REG_A0] > proc->fdinfo.fdmax) {
-		err_log("rvsys_write(): Bad file descriptor %d",
+		warn_log("rvsys_write(): Bad file descriptor %d",
 			(int)proc->regs[REG_A0]);
 		proc->regs[REG_A0] = (reg_t)-1;
 		return 0;
@@ -54,7 +54,7 @@ int rvsys_write(struct proc *proc)
 	buff = getbuff(proc, proc->regs[REG_A1], n, MEM_READ, MEM_READ);
 
 	if (buff == NULL)
-		err_log("rvsys_write(): getbuff(proc, 0x%lx, %zu, %d, %d) returned NULL",
+		warn_log("rvsys_write(): getbuff(proc, 0x%lx, %zu, %d, %d) returned NULL",
 			proc->regs[REG_A1], n, MEM_READ, MEM_READ);
 
 	dbg_log("Emulating sys_write(%d (real fd %d), 0x%lx (real ptr %p), %zu)",
@@ -74,7 +74,7 @@ int rvsys_read(struct proc *proc)
 	int fd;
 
 	if (proc->regs[REG_A0] > proc->fdinfo.fdmax) {
-		err_log("rvsys_read(): Bad file descriptor %d",
+		warn_log("rvsys_read(): Bad file descriptor %d",
 			(int)proc->regs[REG_A0]);
 		proc->regs[REG_A0] = (reg_t)-1;
 		return 0;
@@ -85,7 +85,7 @@ int rvsys_read(struct proc *proc)
 	buff = getbuff(proc, proc->regs[REG_A1], n, MEM_WRITE, MEM_WRITE);
 
 	if (buff == NULL)
-		err_log("rvsys_read(): getbuff(proc, 0x%lx, %zu, %d, %d) returned NULL",
+		warn_log("rvsys_read(): getbuff(proc, 0x%lx, %zu, %d, %d) returned NULL",
 			proc->regs[REG_A1], n, MEM_READ, MEM_READ);
 
 	dbg_log("Emulating sys_read(%d (real fd %d), 0x%lx (real ptr %p), %zu)",
@@ -107,10 +107,8 @@ int rvsys_openat(struct proc *proc)
 	int dfd;
 
 	pathname = getstr(proc, (rvaddr_t)proc->regs[REG_A1], MEM_READ, MEM_READ);
-	if (!pathname) {
-		err_log("Could not get pathname at 0x%lx", proc->regs[REG_A1]);
-		return -1;
-	}
+	if (!pathname)
+		warn_log("Could not get pathname at 0x%lx", proc->regs[REG_A1]);
 
 	dfd = (int)proc->regs[REG_A0];
 	flags = (int)proc->regs[REG_A2];
@@ -118,7 +116,7 @@ int rvsys_openat(struct proc *proc)
 
 	if (dfd != AT_FDCWD && pathname[0] != '/') {
 		if (dfd < 0 || (size_t)dfd > proc->fdinfo.fdmax) {
-			err_log("rvsys_openat(): Invalid dfd argument %d", dfd);
+			warn_log("rvsys_openat(): Invalid dfd argument %d", dfd);
 			dfd = -1;
 		} else {
 			dfd = proc->fdinfo.fds[dfd];
@@ -132,7 +130,7 @@ int rvsys_openat(struct proc *proc)
 	dbg_log("Syscall returned %ld", ret);
 
 	if (ret > 0 && (size_t)ret > proc->fdinfo.fdmax) {
-		err_log("Syscall returned fd too high (%ld), max is %zu", ret,
+		warn_log("Syscall returned fd too high (%ld), max is %zu", ret,
 			proc->fdinfo.fdmax);
 		free(pathname);
 		close((int)ret);
@@ -156,7 +154,7 @@ int rvsys_close(struct proc *proc)
 
 	fd = (int)proc->regs[REG_A0];
 	if ((size_t)fd > proc->fdinfo.fdmax) {
-		err_log("rvsys_close(): Bad file descriptor %d", fd);
+		warn_log("rvsys_close(): Bad file descriptor %d", fd);
 		proc->regs[REG_A0] = (reg_t)-1;
 		return 0;
 	}
