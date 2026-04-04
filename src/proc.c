@@ -107,13 +107,13 @@ int load_argv_and_envp(struct proc *proc, char **argv, char **envp)
 	for (envc = 0; envp[envc]; ++envp)
 		;
 
-	if (loadargv(proc, stack, argc, argv) == -1) {
-		err_log("Failed to load argv");
+	if (loadenvp(proc, stack, envc, envp) == -1) {
+		err_log("Failed to load envp");
 		return -1;
 	}
 
-	if (loadenvp(proc, stack, envc, envp) == -1) {
-		err_log("Failed to load envp");
+	if (loadargv(proc, stack, argc, argv) == -1) {
+		err_log("Failed to load argv");
 		return -1;
 	}
 
@@ -159,12 +159,9 @@ static int loadargv(struct proc *proc, struct memseg *stack, size_t argc, char *
 		sz += sizeof(ptrs[i]);
 	}
 
-	info_log("Setting proc's a1 to 0x%lx (real ptr %p), aka it's argv",
-		 getreg(proc, REG_SP) - sz, stack->mem + memend(proc, stack) - sz);
-	mvreg(proc, REG_A0, (reg_t)argc);
-	mvreg(proc, REG_A1, getreg(proc, REG_SP) - (reg_t)sz);
+	sz += sizeof(argc);
+	memcpy(stack->mem + memend(proc, stack) - sz, &argc, sizeof(argc));
 	mvreg(proc, REG_SP, getreg(proc, REG_SP) - (reg_t)sz);
-
 	if (getreg(proc, REG_SP) < stack->start) {
 		err_log("Stack is not big enough for argv");
 		return -1;
@@ -212,11 +209,7 @@ static int loadenvp(struct proc *proc, struct memseg *stack, size_t envc, char *
 		sz += sizeof(ptrs[i]);
 	}
 
-	info_log("Setting proc's a2 to 0x%lx (real ptr %p), aka it's envp",
-		 getreg(proc, REG_SP) - sz, stack->mem + memend(proc, stack) - sz);
-	mvreg(proc, REG_A2, getreg(proc, REG_SP) - (reg_t)sz);
 	mvreg(proc, REG_SP, getreg(proc, REG_SP) - (reg_t)sz);
-
 	if (getreg(proc, REG_SP) < stack->start) {
 		err_log("Stack is not big enough for envp");
 		return -1;
