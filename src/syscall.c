@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 #include <errno.h>
 #include "memory.h"
 #include "proc.h"
@@ -53,14 +54,19 @@ int rvsys_write(struct proc *proc)
 	n = (size_t)proc->regs[REG_A2];
 	buff = getbuff(proc, proc->regs[REG_A1], n, MEM_READ, MEM_READ);
 
-	if (buff == NULL)
+	if (buff == NULL) {
 		warn_log("rvsys_write(): getbuff(proc, 0x%lx, %zu, %d, %d) returned NULL",
 			proc->regs[REG_A1], n, MEM_READ, MEM_READ);
+		proc->regs[REG_A0] = (reg_t)-1;
+		return 0;
+	}
 
 	dbg_log("Emulating sys_write(%d (real fd %d), 0x%lx (real ptr %p), %zu)",
 		(int)proc->regs[REG_A0], fd, proc->regs[REG_A1], buff, n);
 	ret = syscall(SYS_write, fd, buff, n);
 	dbg_log("Syscall returned %zi", (ssize_t)ret);
+	if (ret < 0)
+		warn_log("sys_write() failed: %s", strerror(errno));
 
 	proc->regs[REG_A0] = (reg_t)ret;
 	return 0;
@@ -84,14 +90,19 @@ int rvsys_read(struct proc *proc)
 	n = (size_t)proc->regs[REG_A2];
 	buff = getbuff(proc, proc->regs[REG_A1], n, MEM_WRITE, MEM_WRITE);
 
-	if (buff == NULL)
+	if (buff == NULL) {
 		warn_log("rvsys_read(): getbuff(proc, 0x%lx, %zu, %d, %d) returned NULL",
-			proc->regs[REG_A1], n, MEM_READ, MEM_READ);
+			proc->regs[REG_A1], n, MEM_WRITE, MEM_WRITE);
+		proc->regs[REG_A0] = (reg_t)-1;
+		return 0;
+	}
 
 	dbg_log("Emulating sys_read(%d (real fd %d), 0x%lx (real ptr %p), %zu)",
 		(int)proc->regs[REG_A0], fd, proc->regs[REG_A1], buff, n);
 	ret = syscall(SYS_read, fd, buff, n);
 	dbg_log("Syscall returned %zi", (ssize_t)ret);
+	if (ret < 0)
+		warn_log("sys_read() failed: %s", strerror(errno));
 
 	proc->regs[REG_A0] = (reg_t)ret;
 	return 0;
@@ -107,8 +118,11 @@ int rvsys_openat(struct proc *proc)
 	int dfd;
 
 	pathname = getstr(proc, (rvaddr_t)proc->regs[REG_A1], MEM_READ, MEM_READ);
-	if (!pathname)
+	if (!pathname) {
 		warn_log("Could not get pathname at 0x%lx", proc->regs[REG_A1]);
+		proc->regs[REG_A0] = (reg_t)-1;
+		return 0;
+	}
 
 	dfd = (int)proc->regs[REG_A0];
 	flags = (int)proc->regs[REG_A2];
@@ -123,7 +137,7 @@ int rvsys_openat(struct proc *proc)
 		}
 	}
 
-	dbg_log("Emulating sys_openat(%d (real fd %d) 0x%lx (real ptr %p: \"%s\"), %d, 0x%x)",
+	dbg_log("Emulating sys_openat(%d (real fd %d) 0x%lx (real ptr %p: \"%s\"), 0x%x, 0x%x)",
 		(int)proc->regs[REG_A0], dfd, proc->regs[REG_A1], pathname,
 		pathname, flags, mode);
 	ret = syscall(SYS_openat, dfd, pathname, flags, mode);
@@ -134,6 +148,11 @@ int rvsys_openat(struct proc *proc)
 			proc->fdinfo.fdmax);
 		free(pathname);
 		close((int)ret);
+		proc->regs[REG_A0] = (reg_t)-1;
+		return 0;
+	} else if (ret < 0) {
+		warn_log("sys_openat() failed: %s", strerror(errno));
+		free(pathname);
 		proc->regs[REG_A0] = (reg_t)-1;
 		return 0;
 	}
@@ -163,6 +182,8 @@ int rvsys_close(struct proc *proc)
 	ret = syscall(SYS_close, proc->fdinfo.fds[fd]);
 	proc->fdinfo.fds[fd] = -1;
 	dbg_log("Syscall returned %ld", ret);
+	if (ret < 0)
+		warn_log("sys_close() failed: %s", strerror(errno));
 
 	proc->regs[REG_A0] = (reg_t)ret;
 	return 0;
