@@ -1,4 +1,6 @@
 test.*
 *.o
 *.d
+examples/*.elf
+examples/*.o
 rvrun
