@@ -1,3 +1,9 @@
+/* SPDX-License-Identifier: GPL-2.0-only */
+/*
+ * Runtime config, parses argv.
+ *
+ *  Copyright (C) 2026 by Diego Oliveira <di.diegoevaristo@gmail.com>
+ */
 #include "config.h"
 #include <getopt.h>
 #include <stdio.h>
@@ -14,8 +20,12 @@ static struct rvconfig *_rvglobalcfg = NULL;
 
 // Free's an option
 static void freeopt(struct optpair *pair) __attribute__((nonnull));
+
 // Displays a help message and then exits
 static void help(struct rvconfig *cfg) __attribute__((nonnull, noreturn));
+
+// Displays version message and exits
+static void version(void) __attribute__((noreturn));
 
 void cleancfg(struct rvconfig *cfg)
 {
@@ -32,7 +42,7 @@ void parsecfg(struct rvconfig *cfg, int argc, char **argv)
 	int ret;
 	int index;
 
-	if (!(longopts = malloc((cfg->size + 2) * sizeof(*longopts))))
+	if (!(longopts = malloc((cfg->size + 1) * sizeof(*longopts))))
 		panic("malloc failed");
 
 	for (i = 0; i < cfg->size; ++i) {
@@ -41,23 +51,12 @@ void parsecfg(struct rvconfig *cfg, int argc, char **argv)
 		cfg->opts[i].opt.val = 0;
 		longopts[i] = cfg->opts[i].opt;
 	}
-	longopts[i++] = (struct option){.name = "help", .has_arg = NO_ARG};
 	longopts[i] = (struct option){0};
 
 	while (!(ret = getopt_long_only(argc, argv, cfg->optstring, longopts,
 					&index))) {
 
-		if ((size_t)index >= cfg->size &&
-		    strcmp(longopts[index].name, "help") == 0) {
-			free(longopts);
-			help(cfg);
-			__builtin_unreachable();
-		}
-
 		cfg->opts[index].rvopt.set = true;
-		if (cfg->opts[index].opt.has_arg == NO_ARG)
-			continue;
-
 		switch (cfg->opts[index].rvopt.type) {
 		case CFG_STDIN:
 			assert(cfg->opts[index].opt.has_arg == ARG_MANDATORY);
@@ -112,6 +111,14 @@ void parsecfg(struct rvconfig *cfg, int argc, char **argv)
 
 			break;
 
+		case CFG_HELP:
+			free(longopts);
+			help(cfg);
+			__builtin_unreachable();
+		case CFG_VERSION:
+			free(longopts);
+			version();
+			__builtin_unreachable();
 		default:
 			panic("Invalid option type");
 		}
@@ -168,24 +175,29 @@ static void help(struct rvconfig *cfg)
 {
 	size_t i;
 
-	fputs("Usage: rvrun [OPTIONS]... [PROGRAM]\n", stderr);
-	fputs("Emulates the RISC-V 64bit linux userspace\n", stderr);
-	fputs("No isolation is provided, PROGRAM must be a RISC-V ELF file\n",
-		stderr);
+	fputs("Usage: rvrun [OPTIONS]... [PROGRAM] [PROGRAM OPTIONS]...\n",	stderr);
+	fputs("Emulates the RISC-V 64bit linux userspace\n",			stderr);
+	fputs("No isolation is provided, PROGRAM must be a RISC-V ELF file\n",	stderr);
+	fputs("PROGRAM OPTIONS are passed to PROGRAM in it's argv\n",		stderr);
 
 	fputc('\n', stderr);
 	for (i = 0; i < cfg->size; ++i)
 		fprintf(stderr, "%s\n", cfg->opts[i].help);
-	fputs("\n\t--help: Displays this message and exits\n", stderr);
 	fputc('\n', stderr);
 
 	fputs(  "The exit code is passed by the emulated process, if RvRun\n"
 		"fails, there will be a logging message, at which point there\n"
-		"will be a message started by either \"[ERROR]\" or \"[PANIC]\".\n"
-		"The source code can be found at https://github.com/foo8664/RVrun\n"
-		"And is currently licensed under the GPLv2\n",
+		"will be a message started by either \"[ERROR]\" or \"[PANIC]\".\n\n\n",
 		stderr);
 
 	cleancfg(cfg);
+	version();
+}
+
+static void version(void)
+{
+	fprintf(stderr, "RvRun version %d.%d, Copyright (CC) Diego Oliveira <di.diegoevaristo@gmail.com>\n"
+		"RvRun comes with ABSOLUTELY NO WARRANTY; Licensed under the GPL version 2\n",
+		RVRUN_VERSION_MAJOR, RVRUN_VERSION_MINOR);
 	exit(0);
 }
