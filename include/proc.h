@@ -35,10 +35,14 @@ struct proc {
 
 // Free's a process allocated by loadproc
 void freeproc(struct proc *proc) __attribute__((nonnull, cold));
+
 // Loades a process from an ELF file
 struct proc *loadproc(const char *path)
 	__attribute__((nonnull, cold, malloc(freeproc, 1)));
 
+// Loads a processes argv and envp. argv should not contain RvRun's arguments
+int load_argv_and_envp(struct proc *proc, char **argv, char **envp)
+	__attribute__((nonnull, cold));
 
 // set and get a process's registers
 static inline void mvreg(struct proc *proc, enum ABI_REG reg, reg_t val)

@@ -21,7 +21,7 @@ static int exec_cycle(struct proc *proc) __attribute__((nonnull, cold));
 // Parses options and sets globalcfg from config.h
 static void setcfg(int argc, char **argv) __attribute__((nonnull, cold));
 
-int main(int argc, char **argv)
+int main(int argc, char **argv, char **envp)
 {
 	struct proc *proc;
 	int ret;
@@ -32,13 +32,16 @@ int main(int argc, char **argv)
 		panic("Needs a file to execute");
 
 	if (!(proc = loadproc(argv[optind])))
-		return 1;
+		panic("Could not load process");
 
-	ret = exec_cycle(proc);
-	if (ret != 0)
-		err_log("Interrupting fetch-decode-exec cycle");
-	else
-		ret = proc->exitinfo.status;
+	if (load_argv_and_envp(proc, &argv[optind], envp) == -1) {
+		freeproc(proc);
+		panic("Could not load processes argv or envp");
+	}
+
+	if (exec_cycle(proc))
+		panic("Interrupting fetch-decode-exec cycle");
+	ret = proc->exitinfo.status;
 
 	freeproc(proc);
 	cleancfg(&globalcfg);

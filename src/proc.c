@@ -33,6 +33,13 @@ static int loadseg(FILE *fp, Elf64_Phdr elfph, struct proc *proc)
 					__attribute__((nonnull, cold));
 static int loadstack(struct proc *proc)	__attribute__((nonnull, cold));
 static int loadfds(struct proc *proc)	__attribute__((nonnull, cold));
+static int loadargv(struct proc *proc, struct memseg *stack, size_t argc, char **argv)
+	__attribute__((nonnull(1, 2), nonnull_if_nonzero(4, 3), cold));
+static int loadenvp(struct proc *proc, struct memseg *stack, size_t envc, char **envp)
+	__attribute__((nonnull(1, 2), nonnull_if_nonzero(4, 3), cold));
+static inline size_t memend(struct proc *proc, struct memseg *stack)
+	__attribute__((nonnull));
+
 
 struct proc *loadproc(const char *path)
 {
@@ -76,6 +83,147 @@ void freeproc(struct proc *proc)
 
 	freemem(&proc->mem);
 	free(proc);
+}
+
+int load_argv_and_envp(struct proc *proc, char **argv, char **envp)
+{
+	struct memseg *stack;
+	size_t argc;
+	size_t envc;
+
+	stack = is_memseg(proc->mem, proc->regs[REG_SP], proc->regs[REG_SP]);
+	if (!stack) {
+		err_log("Tried loading argv with no stack");
+		return -1;
+	}
+
+	if ((stack->flags & MEM_WRITE) == 0) {
+		err_log("Stack is not writable, can't set argv");
+		return -1;
+	}
+
+	for (argc = 0; argv[argc]; ++argc)
+		;
+	for (envc = 0; envp[envc]; ++envp)
+		;
+
+	if (loadargv(proc, stack, argc, argv) == -1) {
+		err_log("Failed to load argv");
+		return -1;
+	}
+
+	if (loadenvp(proc, stack, envc, envp) == -1) {
+		err_log("Failed to load envp");
+		return -1;
+	}
+
+	return 0;
+}
+
+static int loadargv(struct proc *proc, struct memseg *stack, size_t argc, char **argv)
+{
+	rvaddr_t ptrs[argc + 1];
+	size_t sz = 0;
+	size_t i = 0;
+	size_t len;
+
+	for (i = 0; i < argc; ++i) {
+		len = strlen(argv[i]) + 1;
+		ptrs[i] = getreg(proc, REG_SP) - sz - len;
+
+		if (stack->start + sz >= stack->end) {
+			err_log("Stack is not big enough for argv");
+			return -1;
+		}
+
+		memcpy(stack->mem + memend(proc, stack) - sz - len, argv[i], len);
+		info_log("Loading '%s' into the stack at 0x%lx (real ptr %p)",
+			 argv[i], ptrs[i],
+			 (void *)(stack->mem + memend(proc, stack) - sz - len));
+		sz += len;
+	}
+
+	sz += sizeof(*ptrs);
+	ptrs[argc] = 0;
+	for (i = argc; i <= argc; --i) {
+		if (stack->start + sz >= stack->end) {
+			err_log("Stack is not big enough for argv");
+			return -1;
+		}
+
+		memcpy(stack->mem + memend(proc, stack) - sz - sizeof(ptrs[i]),
+		       &ptrs[i], sizeof(ptrs[i]));
+		info_log("Loading 0x%lx into the stack at 0x%lx (real ptr %p)",
+			 ptrs[i], getreg(proc, REG_SP) - sz - sizeof(ptrs[i]),
+			 (void *)(stack->mem + memend(proc, stack) - sz - sizeof(ptrs[i])));
+		sz += sizeof(ptrs[i]);
+	}
+
+	info_log("Setting proc's a1 to 0x%lx (real ptr %p), aka it's argv",
+		 getreg(proc, REG_SP) - sz, stack->mem + memend(proc, stack) - sz);
+	mvreg(proc, REG_A0, (reg_t)argc);
+	mvreg(proc, REG_A1, getreg(proc, REG_SP) - (reg_t)sz);
+	mvreg(proc, REG_SP, getreg(proc, REG_SP) - (reg_t)sz);
+
+	if (getreg(proc, REG_SP) < stack->start) {
+		err_log("Stack is not big enough for argv");
+		return -1;
+	}
+
+	info_log("Loaded %zu arguments into the stack", argc);
+	return 0;
+}
+
+static int loadenvp(struct proc *proc, struct memseg *stack, size_t envc, char **envp)
+{
+	rvaddr_t ptrs[envc + 1];
+	size_t sz = 0;
+	size_t i = 0;
+	size_t len;
+
+	for (i = 0; i < envc; ++i) {
+		len = strlen(envp[i]) + 1;
+		sz += len;
+		ptrs[i] = getreg(proc, REG_SP) - sz - len;
+
+		if (stack->start + sz >= stack->end) {
+			err_log("Stack is not big enough for envp");
+			return -1;
+		}
+		memcpy(stack->mem + memend(proc, stack) - sz - len, envp[i], len);
+		info_log("Loading '%s' into the stack at 0x%lx (real ptr %p)",
+			 envp[i], ptrs[i],
+			 (void *)(stack->mem + memend(proc, stack) - sz - len));
+	}
+
+	sz += sizeof(*ptrs);
+	ptrs[envc] = 0;
+	for (i = 0; i <= envc; ++i) {
+		if (stack->start + sz >= stack->end) {
+			err_log("Stack is not big enough for envp");
+			return -1;
+		}
+
+		memcpy(stack->mem + memend(proc, stack) - sz - sizeof(ptrs[i]),
+		       &ptrs[i], sizeof(ptrs[i]));
+		info_log("Loading 0x%lx into the stack at 0x%lx (real ptr %p)",
+			 ptrs[i], getreg(proc, REG_SP) - sz - sizeof(ptrs[i]),
+			 (void *)(stack->mem + memend(proc, stack) - sz - sizeof(ptrs[i])));
+		sz += sizeof(ptrs[i]);
+	}
+
+	info_log("Setting proc's a2 to 0x%lx (real ptr %p), aka it's envp",
+		 getreg(proc, REG_SP) - sz, stack->mem + memend(proc, stack) - sz);
+	mvreg(proc, REG_A2, getreg(proc, REG_SP) - (reg_t)sz);
+	mvreg(proc, REG_SP, getreg(proc, REG_SP) - (reg_t)sz);
+
+	if (getreg(proc, REG_SP) < stack->start) {
+		err_log("Stack is not big enough for envp");
+		return -1;
+	}
+
+	info_log("Loaded %zu environment variables into the stack", envc);
+	return 0;
 }
 
 static int elfparse(FILE *file, struct proc *proc, const char *path)
@@ -261,4 +409,9 @@ static int loadfds(struct proc *proc)
 		proc->fdinfo.fds[STDERR_FILENO] = STDERR_FILENO;
 
 	return 0;
+}
+
+static inline size_t memend(struct proc *proc, struct memseg *stack)
+{
+	return (size_t)(getreg(proc, REG_SP) - stack->start);
 }
