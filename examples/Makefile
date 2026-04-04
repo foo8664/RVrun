@@ -9,6 +9,8 @@ LD = riscv64-elf-linux-gnu-ld
 common.o: common.asm
 	$(AS) common.asm -o common.o
 
-.PHONY: clean
+.PHONY: clean all
 clean:
 	-rm *.o *.elf 2>/dev/null || true
+all: common.o
+	./make_all.sh
