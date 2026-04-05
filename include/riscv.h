@@ -53,6 +53,47 @@ enum ABI_REG {
 	REG_T6,
 };
 
+// Convert register number to abi name
 const char *reg2abi(enum ABI_REG r) __attribute__((const, leaf));
+
+// Sign-extend/Zero-extend values
+static inline uint64_t extend32to64(uint32_t i32);
+static inline uint64_t extend16to64(uint16_t i16);
+static inline uint64_t extend8to64(uint8_t i8);
+static inline uint64_t zextend32to64(uint32_t i32);
+static inline uint64_t zextend16to64(uint16_t i16);
+static inline uint64_t zextend8to64(uint8_t i8);
+
+
+// Inline functions
+static inline uint64_t extend32to64(uint32_t i32)
+{
+	return i32 & 0x80000000 ? (uint64_t)i32 | (~0lu << 32) : i32;
+}
+
+static inline uint64_t extend16to64(uint16_t i16)
+{
+	return i16 & 0x8000 ? (uint64_t)i16 | (~0lu << 16) : i16;
+}
+
+static inline uint64_t extend8to64(uint8_t i8)
+{
+	return i8 & 0x80 ? (uint64_t)i8 | (~0lu << 8) : i8;
+}
+
+static inline uint64_t zextend32to64(uint32_t u32)
+{
+	return (uint64_t)u32;
+}
+
+static inline uint64_t zextend16to64(uint16_t u16)
+{
+	return (uint64_t)u16;
+}
+
+static inline uint64_t zextend8to64(uint8_t u8)
+{
+	return (uint64_t)u8;
+}
 
 #endif // RISCV_H

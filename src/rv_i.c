@@ -34,14 +34,6 @@ static inline void B_getfields(insn_t insn, enum ABI_REG *rs1, enum ABI_REG *rs2
 static inline void S_getfields(insn_t insn, enum ABI_REG *rs1, enum ABI_REG *rs2,
 		               uint64_t *imm)	__attribute__((nonnull));
 
-// Sign-extend/Zero-extend values
-static inline uint64_t extend32to64(uint32_t i32);
-static inline uint64_t extend16to64(uint16_t i16);
-static inline uint64_t extend8to64(uint8_t i8);
-static inline uint64_t zextend32to64(uint32_t i32);
-static inline uint64_t zextend16to64(uint16_t i16);
-static inline uint64_t zextend8to64(uint8_t i8);
-
 
 static inline void R_getfields(insn_t insn, enum ABI_REG *rd, enum ABI_REG *rs1,
 			       enum ABI_REG *rs2)
@@ -96,37 +88,6 @@ static inline void S_getfields(insn_t insn, enum ABI_REG *rs1, enum ABI_REG *rs2
 	*imm =  (uint64_t)((insn & 0xf80)	>> 7);
 	*imm |= (uint64_t)((insn & 0xfe000000)	>> 20);
 	*imm |= (uint64_t)((insn & (0x1u << 31u)) ? (~0lu << 12) : 0lu);
-}
-
-
-static inline uint64_t extend32to64(uint32_t i32)
-{
-	return i32 & 0x80000000 ? (uint64_t)i32 | (~0lu << 32) : i32;
-}
-
-static inline uint64_t extend16to64(uint16_t i16)
-{
-	return i16 & 0x8000 ? (uint64_t)i16 | (~0lu << 16) : i16;
-}
-
-static inline uint64_t extend8to64(uint8_t i8)
-{
-	return i8 & 0x80 ? (uint64_t)i8 | (~0lu << 8) : i8;
-}
-
-static inline uint64_t zextend32to64(uint32_t u32)
-{
-	return (uint64_t)u32;
-}
-
-static inline uint64_t zextend16to64(uint16_t u16)
-{
-	return (uint64_t)u16;
-}
-
-static inline uint64_t zextend8to64(uint8_t u8)
-{
-	return (uint64_t)u8;
 }
 
 
