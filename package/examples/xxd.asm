@@ -1,9 +1,3 @@
-/* SPDX-License-Identifier: GPL-2.0-only */
-/*
- * Recreation of the xxd UNIX utility
- *
- *  Copyright (C) 2026 by Diego Oliveira <di.diegoevaristo@gmail.com>
- */
 .section .text
 .globl main
 .type main, @function
