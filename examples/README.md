@@ -30,5 +30,6 @@ To delete all of the object files and binaries
  * echo
  * cat
  * xxd
+
 These programs should be available at any modern linux system, with man pages!
 The current examples cannot take any flags to modify behaviour, but they do take arguments
