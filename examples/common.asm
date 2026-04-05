@@ -1,3 +1,10 @@
+/* SPDX-License-Identifier: GPL-2.0-only */
+/*
+ * Common functions for RvRun's example programs
+ *
+ *  Copyright (C) 2026 by Diego Oliveira <di.diegoevaristo@gmail.com>
+ */
+
 .section .text
 .global _start
 .type _start, @function

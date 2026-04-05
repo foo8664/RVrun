@@ -1,3 +1,9 @@
+# SPDX-License-Identifier: GPL-2.0-only
+#
+#  Makefile for RvRun
+#
+#   Copyright (C) 2026 by Diego Oliveira <di.diegoevaristo@gmail.com>
+#
 PREFIX ?= /usr/local
 
 src = src

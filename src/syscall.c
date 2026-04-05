@@ -1,3 +1,9 @@
+/* SPDX-License-Identifier: GPL-2.0-only */
+/*
+ * Linux's syscall emulation
+ *
+ *  Copyright (C) 2026 by Diego Oliveira <di.diegoevaristo@gmail.com>
+ */
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>

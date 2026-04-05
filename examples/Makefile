@@ -1,3 +1,10 @@
+# SPDX-License-Identifier: GPL-2.0-only
+#
+#  Makefile for RvRun's example programs
+#
+#   Copyright (C) 2026 by Diego Oliveira <di.diegoevaristo@gmail.com>
+#
+
 # Might want to edit these:
 AS = riscv64-elf-linux-gnu-as
 LD = riscv64-elf-linux-gnu-ld
