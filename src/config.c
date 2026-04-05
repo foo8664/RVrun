@@ -2,7 +2,7 @@
 /*
  * Runtime config, parses argv.
  *
- *  Copyright (C) 2026 by Diego Oliveira <di.diegoevaristo@gmail.com>
+ *  Copyright (C) 2026 by Diego Evaristo <di.diegoevaristo@gmail.com>
  */
 #include "config.h"
 #include <getopt.h>
@@ -196,7 +196,7 @@ static void help(struct rvconfig *cfg)
 
 static void version(void)
 {
-	fprintf(stderr, "RvRun version %d.%d, Copyright (CC) Diego Oliveira <di.diegoevaristo@gmail.com>\n"
+	fprintf(stderr, "RvRun version %d.%d, Copyright (CC) Diego Evaristo <di.diegoevaristo@gmail.com>\n"
 		"RvRun comes with ABSOLUTELY NO WARRANTY; Licensed under the GPL version 2\n",
 		RVRUN_VERSION_MAJOR, RVRUN_VERSION_MINOR);
 	exit(0);

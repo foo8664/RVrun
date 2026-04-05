@@ -2,7 +2,7 @@
 /*
  * RISC-V constants and typedefs
  *
- *  Copyright (C) 2026 by Diego Oliveira <di.diegoevaristo@gmail.com>
+ *  Copyright (C) 2026 by Diego Evaristo <di.diegoevaristo@gmail.com>
  */
 
 #ifndef RISCV_H
