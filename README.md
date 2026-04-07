@@ -58,13 +58,13 @@ RvRun requires a file to execute, it should be an ELF file for a little endian,
 executable, RISC-V program, it is the first positional argument, and everything
 passed after it will be considered an argument for that program, not for RvRun.
 RvRun supports multiple flags, these are:
-    * --help:             Show a message similar to this, explaining how to use RvRun
-    * --version:          Show a version and exit
-    * --stdin=FILE:       redirect emulated processe's stdin from FILE, without affecting RvRun
-    * --stdout=FILE:      redirect emulated processe's stdout to FILE, without affecting RvRun
-    * --stderr=FILE:      redirect emulated processe's stderr to FILE, without affecting RvRun
-    * --log-level=LEVEL:  Determine which logs will be outputed and which won't, defaults to 1
-    * --log-file=FILE:    Redirect RvRun's logs to FILE
+ * --help:             Show a message similar to this, explaining how to use RvRun
+ * --version:          Show a version and exit
+ * --stdin=FILE:       redirect emulated processe's stdin from FILE, without affecting RvRun
+ * --stdout=FILE:      redirect emulated processe's stdout to FILE, without affecting RvRun
+ * --stderr=FILE:      redirect emulated processe's stderr to FILE, without affecting RvRun
+ * --log-level=LEVEL:  Determine which logs will be outputed and which won't, defaults to 1
+ * --log-file=FILE:    Redirect RvRun's logs to FILE
 For a full description of how to use RvRun, you can run it with the --help flag
 
 
