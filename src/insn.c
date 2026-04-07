@@ -8,10 +8,12 @@
 #include <errno.h>
 #include <stddef.h>
 #include "riscv.h"
-#include "rv_i.h"
 #include "proc.h"
 #include "debug.h"
 #include "insn.h"
+
+#include "rv_i.h"
+#include "rv_m.h"
 
 int insn_fetch(struct proc *proc, insn_t *insn)
 {
@@ -37,8 +39,7 @@ int insn_fetch(struct proc *proc, insn_t *insn)
 #define ADD_INSN(name, fname) if (IS_INSN(insn, name)) return (fname)
 int (*insn_decode(insn_t insn))(struct proc *, insn_t)
 {
-	// Rv64I instructions
-	// Register-Register:
+#ifdef HAVE_RV64I // Rv64I Instructions:
 	ADD_INSN(ADD,	insn_add);
 	ADD_INSN(SLT,	insn_slt);
 	ADD_INSN(SLTU,	insn_sltu);
@@ -54,8 +55,6 @@ int (*insn_decode(insn_t insn))(struct proc *, insn_t)
 	ADD_INSN(SLLW,	insn_sllw);
 	ADD_INSN(SRLW,	insn_srlw);
 	ADD_INSN(SRLW,	insn_srlw);
-
-	// Register-Immediate:
 	ADD_INSN(ANDI,	insn_andi);
 	ADD_INSN(ORI, 	insn_ori);
 	ADD_INSN(XORI,	insn_xori);
@@ -71,8 +70,6 @@ int (*insn_decode(insn_t insn))(struct proc *, insn_t)
 	ADD_INSN(SRAIW,	insn_sraiw);
 	ADD_INSN(LUI,	insn_lui);
 	ADD_INSN(AUIPC,	insn_auipc);
-
-	// Jump:
 	ADD_INSN(JAL,	insn_jal);
 	ADD_INSN(JALR,	insn_jalr);
 	ADD_INSN(BEQ,	insn_beq);
@@ -81,8 +78,6 @@ int (*insn_decode(insn_t insn))(struct proc *, insn_t)
 	ADD_INSN(BLTU,	insn_bltu);
 	ADD_INSN(BGE,	insn_bge);
 	ADD_INSN(BGEU,	insn_bgeu);
-
-	// Load/Store:
 	ADD_INSN(LB,	insn_lb);
 	ADD_INSN(LH,	insn_lh);
 	ADD_INSN(LW,	insn_lw);
@@ -94,11 +89,18 @@ int (*insn_decode(insn_t insn))(struct proc *, insn_t)
 	ADD_INSN(SH,	insn_sh);
 	ADD_INSN(SW,	insn_sw);
 	ADD_INSN(SD,	insn_sd);
-
-	// Miscallenous:
 	ADD_INSN(ECALL, insn_ecall);
 	ADD_INSN(EBREAK,insn_ebreak);
 	ADD_INSN(FENCE, insn_fence);
+#endif
+
+#ifdef HAVE_RV64M // Rv64M Instructions
+	ADD_INSN(MUL,	insn_mul);
+	ADD_INSN(MULW,	insn_mulw);
+	ADD_INSN(MULH,	insn_mulh);
+	ADD_INSN(MULHU,	insn_mulhu);
+	ADD_INSN(MULHSU,insn_mulhsu);
+#endif
 
 	errno = ENOSYS;
 	return NULL;

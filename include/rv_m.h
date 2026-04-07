@@ -1,0 +1,27 @@
+/* SPDX-License-Identifier: GPL-2.0-only */
+/*
+ * Rv64M Instructions
+ *
+ *  Copyright (C) 2026 by Diego Evaristo <di.diegoevaristo@gmail.com>
+ */
+
+#ifndef RVRUN_RV64M_H
+#define RVRUN_RV64M_H
+
+#include "riscv.h"
+#include "proc.h"
+
+#ifdef __x86_64__
+# define HAVE_RV64M
+
+int insn_mul(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_mulw(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_mulh(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_mulhu(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+int insn_mulhsu(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+
+#else
+# warning "The M extension is only currently supported for AMD64 (aka x86-64) machines"
+#endif
+
+#endif // RVRUN_RV64M_H

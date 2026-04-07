@@ -11,6 +11,8 @@
 #include "riscv.h"
 #include "proc.h"
 
+#define HAVE_RV64I
+
 /*
  * These are the functions returned by insn_decode(), they simulate the
  * instruction with their name on the process `proc`. `insn` should be their

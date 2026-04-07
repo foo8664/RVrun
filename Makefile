@@ -17,7 +17,8 @@ CFLAGS += -O2 -mtune=native
 CFLAGS += -DRVRUN_VERSION_MAJOR=1 -DRVRUN_VERSION_MINOR=0
 
 VPATH = $(src):$(headers)
-objs = main.o debug.o config.o memory.o proc.o syscall.o rv_i.o insn.o riscv.o
+objs = main.o debug.o config.o memory.o proc.o syscall.o insn.o riscv.o rv_i.o \
+       rv_m.o
 
 rvrun: $(objs)
 	$(CC) $(CFLAGS) $(objs) -o rvrun

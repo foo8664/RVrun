@@ -20,6 +20,8 @@
 #include "syscall.h"
 #include "sysnums.h"
 
+#ifdef HAVE_RV64I
+
 // Get info from OP-Code fields
 static inline void R_getfields(insn_t insn, enum ABI_REG *rd, enum ABI_REG *rs1,
 			       enum ABI_REG *rs2) __attribute__((nonnull));
@@ -948,3 +950,4 @@ int insn_ecall(struct proc *proc, insn_t insn)
 	errno = ENOSYS;
 	return -1;
 }
+#endif // HAVE_RV64I
