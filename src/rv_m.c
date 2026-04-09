@@ -24,12 +24,12 @@ static inline int64_t imulh(int64_t a, int64_t b)
 {
 	int64_t c;
 	__asm__("movq %1, %%rax;\n\t"
-		"movq %2, %%rsi;\n\t"
-		"imulq %%rsi;\n\t"
+		"movq %2, %%rdx;\n\t"
+		"imulq %%rdx;\n\t"
 		"movq %%rdx, %0"
 		: "=r"(c)
 		: "r"(a), "r"(b)
-		: "%rax", "%rsi", "%rdx"
+		: "%rax", "%rdx"
 	);
 
 	return c;
@@ -39,12 +39,12 @@ static inline uint64_t umulh(uint64_t a, uint64_t b)
 {
 	uint64_t c;
 	__asm__("movq %1, %%rax;\n\t"
-		"movq %2, %%rsi;\n\t"
-		"mulq %%rsi;\n\t"
+		"movq %2, %%rdx;\n\t"
+		"mulq %%rdx;\n\t"
 		"movq %%rdx, %0"
 		: "=r"(c)
 		: "r"(a), "r"(b)
-		: "%rax", "%rsi", "%rdx"
+		: "%rax", "%rdx"
 	);
 
 	return c;
@@ -121,7 +121,7 @@ int insn_mulhsu(struct proc *proc, insn_t insn)
 
 	getfields(insn, &rd, &rs1, &rs2);
 	if ((int64_t)getreg(proc, rs1) < 0) {
-		c = -(umulh((uint64_t)-getreg(proc, rs1), (uint64_t)getreg(proc, rs2)));
+		c = -(umulh(-(uint64_t)getreg(proc, rs1), (uint64_t)getreg(proc, rs2)));
 		mvreg(proc, rd, (reg_t)(c ? c : ~0lu));
 	} else {
 		mvreg(proc, rd, (reg_t)(umulh((uint64_t)getreg(proc, rs1),
