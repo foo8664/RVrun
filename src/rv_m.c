@@ -141,13 +141,13 @@ int insn_div(struct proc *proc, insn_t insn)
 	enum ABI_REG rs2;
 
 	getfields(insn, &rd, &rs1, &rs2);
-	if (getreg(proc, rs2) == 0) {
+	if (UNLIKELY(getreg(proc, rs2) == 0)) {
 		mvreg(proc, rd, (reg_t)-1);
 		warn_log("0x%lx: div: Division by zero (%s = %ld)", proc->pc,
 			 reg2abi(rd), getreg(proc, rd));
 		return 0;
-	} else if (getreg(proc, rs1) == (reg_t)-(1llu << (XLEN - 1)) &&
-		   getreg(proc, rs2) == (reg_t)-1) {
+	} else if (UNLIKELY(getreg(proc, rs1) == (reg_t)-(1llu << (XLEN - 1))
+			 && getreg(proc, rs2) == (reg_t)-1)) {
 		mvreg(proc, rd, (reg_t)-(1llu << (XLEN - 1)));
 		warn_log("0x%lx: div: Division overflew (%s = %lx)", proc->pc,
 			 reg2abi(rd), getreg(proc, rd));
@@ -168,7 +168,7 @@ int insn_divu(struct proc *proc, insn_t insn)
 	enum ABI_REG rs2;
 
 	getfields(insn, &rd, &rs1, &rs2);
-	if (getreg(proc, rs2) == 0) {
+	if (UNLIKELY(getreg(proc, rs2) == 0)) {
 		mvreg(proc, rd, (reg_t)(~0llu));
 		warn_log("0x%lx: divu: Division by zero (%s = %ld)", proc->pc,
 			 reg2abi(rd), getreg(proc, rd));
@@ -189,13 +189,13 @@ int insn_divw(struct proc *proc, insn_t insn)
 	enum ABI_REG rs2;
 
 	getfields(insn, &rd, &rs1, &rs2);
-	if (getreg(proc, rs2) == 0) {
+	if (UNLIKELY(getreg(proc, rs2) == 0)) {
 		mvreg(proc, rd, (reg_t)-1);
 		warn_log("0x%lx: divw: Division by zero (%s = %ld)", proc->pc,
 			 reg2abi(rd), getreg(proc, rd));
 		return 0;
-	} else if (getreg(proc, rs1) == (reg_t)-(1llu << (32 - 1)) &&
-		   getreg(proc, rs2) == (reg_t)-1) {
+	} else if (UNLIKELY(getreg(proc, rs1) == (reg_t)-(1llu << (32 - 1)) &&
+			    getreg(proc, rs2) == (reg_t)-1)) {
 		mvreg(proc, rd, 0xffffffff80000000llu);
 		warn_log("0x%lx: divw: Division overflew (%s = %lx)", proc->pc,
 			 reg2abi(rd), getreg(proc, rd));
@@ -217,7 +217,7 @@ int insn_divuw(struct proc *proc, insn_t insn)
 	enum ABI_REG rs2;
 
 	getfields(insn, &rd, &rs1, &rs2);
-	if (getreg(proc, rs2) == 0) {
+	if (UNLIKELY(getreg(proc, rs2) == 0)) {
 		mvreg(proc, rd, (reg_t)(~0llu));
 		warn_log("0x%lx: divuw: Division by zero (%s = %ld)", proc->pc,
 			 reg2abi(rd), getreg(proc, rd));
@@ -239,13 +239,13 @@ int insn_rem(struct proc *proc, insn_t insn)
 	enum ABI_REG rs2;
 
 	getfields(insn, &rd, &rs1, &rs2);
-	if (getreg(proc, rs2) == 0) {
+	if (UNLIKELY(getreg(proc, rs2) == 0)) {
 		mvreg(proc, rd, getreg(proc, rs1));
 		warn_log("0x%lx: rem: Division by zero (%s = %ld)", proc->pc,
 			 reg2abi(rd), getreg(proc, rd));
 		return 0;
-	} else if (getreg(proc, rs1) == (reg_t)-(1llu << (XLEN - 1)) &&
-		   getreg(proc, rs2) == (reg_t)-1) {
+	} else if (UNLIKELY(getreg(proc, rs1) == (reg_t)-(1llu << (XLEN - 1)) &&
+			    getreg(proc, rs2) == (reg_t)-1)) {
 		mvreg(proc, rd, 0);
 		warn_log("0x%lx: rem: Division overflew (%s = %ld)", proc->pc,
 			 reg2abi(rd), getreg(proc, rd));
@@ -266,7 +266,7 @@ int insn_remu(struct proc *proc, insn_t insn)
 	enum ABI_REG rs2;
 
 	getfields(insn, &rd, &rs1, &rs2);
-	if (getreg(proc, rs2) == 0) {
+	if (UNLIKELY(getreg(proc, rs2) == 0)) {
 		mvreg(proc, rd, getreg(proc, rs1));
 		warn_log("0x%lx: remu: Division by zero (%s = %ld)", proc->pc,
 			 reg2abi(rd), getreg(proc, rd));
@@ -287,13 +287,13 @@ int insn_remw(struct proc *proc, insn_t insn)
 	enum ABI_REG rs2;
 
 	getfields(insn, &rd, &rs1, &rs2);
-	if (getreg(proc, rs2) == 0) {
+	if (UNLIKELY(getreg(proc, rs2) == 0)) {
 		mvreg(proc, rd, extend32to64((uint32_t)getreg(proc, rs1)));
 		warn_log("0x%lx: remw: Division by zero (%s = %ld)", proc->pc,
 			 reg2abi(rd), getreg(proc, rd));
 		return 0;
-	} else if (getreg(proc, rs1) == (reg_t)-(1llu << (32 - 1)) &&
-		   getreg(proc, rs2) == (reg_t)-1) {
+	} else if (UNLIKELY(getreg(proc, rs1) == (reg_t)-(1llu << (32 - 1)) &&
+			    getreg(proc, rs2) == (reg_t)-1)) {
 		mvreg(proc, rd, 0);
 		warn_log("0x%lx: remw: Division overflew (%s = %ld)", proc->pc,
 			 reg2abi(rd), getreg(proc, rd));
@@ -315,7 +315,7 @@ int insn_remuw(struct proc *proc, insn_t insn)
 	enum ABI_REG rs2;
 
 	getfields(insn, &rd, &rs1, &rs2);
-	if (getreg(proc, rs2) == 0) {
+	if (UNLIKELY(getreg(proc, rs2) == 0)) {
 		mvreg(proc, rd, extend32to64((uint32_t)getreg(proc, rs1)));
 		warn_log("0x%lx: remwu: Division by zero (%s = %ld)", proc->pc,
 			 reg2abi(rd), getreg(proc, rd));

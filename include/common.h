@@ -35,18 +35,4 @@
 # define ATTRIBUTE(...)
 #endif
 
-// Cache optimizations
-#define PREFETCH_READ 0
-#define PREFETCH_WRITE 1
-#define PREFETCH_SHARED_READ 2
-#define PREFETCH_NOTMP 0
-#define PREFETCH_LOWTMP 1
-#define PREFETCH_MODERATETMP 2
-#define PREFETCH_HIGHTMP 3
-#ifdef __GNUC__
-# define PREFETCH(addr, ...) (__builtin_prefetch(addr, __VA_ARGS__))
-#else
-# define PREFETCH(addr, ...)
-#endif
-
 #endif // RVRUN_COMMON_H

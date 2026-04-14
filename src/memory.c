@@ -120,10 +120,10 @@ int memloadN(struct memory mem, rvaddr_t addr, uint8_t size, void *out)
 	assert(size == 8 || size == 16 || size == 32 || size == 64);
 
 	seg = is_memseg(mem, addr, addr + (size / 8) + 1);
-	if (!seg) {
+	if (UNLIKELY(!seg)) {
 		errno = EINVAL;
 		return -1;
-	} else if (!(seg->flags & MEM_READ)) {
+	} else if (UNLIKELY(!(seg->flags & MEM_READ))) {
 		errno = EPERM;
 		return -1;
 	}
@@ -153,10 +153,10 @@ int memstoreN(struct memory mem, rvaddr_t addr, uint8_t size, const void *in)
 	assert(size == 8 || size == 16 || size == 32 || size == 64);
 
 	seg = is_memseg(mem, addr, addr + (size / 8) + 1);
-	if (!seg) {
+	if (UNLIKELY(!seg)) {
 		errno = EINVAL;
 		return -1;
-	} else if (!(seg->flags & MEM_WRITE)) {
+	} else if (UNLIKELY(!(seg->flags & MEM_WRITE))) {
 		errno = EPERM;
 		return -1;
 	}

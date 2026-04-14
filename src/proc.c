@@ -292,8 +292,8 @@ static int loadseg(FILE *fp, Elf64_Phdr elfph, struct proc *proc)
 	flags |= (elfph.p_flags & PF_W) ? MEM_WRITE : 0;
 	flags |= (elfph.p_flags & PF_X) ? MEM_EXEC : 0;
 
-	dbg_log("Loading file contents from offset 0x%lx to 0x%lx into address"
-		" 0x%lx to 0x%lx, flags=0x%hhx", elfph.p_offset,
+	info_log("Loading file contents from offset 0x%lx to 0x%lx into address"
+		 " 0x%lx to 0x%lx, flags=0x%hhx", elfph.p_offset,
 		elfph.p_offset + elfph.p_filesz, elfph.p_vaddr,
 		elfph.p_vaddr + elfph.p_memsz, flags);
 

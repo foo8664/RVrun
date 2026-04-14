@@ -504,7 +504,7 @@ int insn_jal(struct proc *proc, insn_t insn)
 	dbg_log("0x%lx: jal: %s = 0x%lx, pc += 0x%lx", (unsigned long)proc->pc,
 		reg2abi(rd), getreg(proc, rd), imm);
 	proc->pc += imm - 4; // Cycle always adds size of current instruction
-	if (proc->pc % IALIGN != 0) {
+	if (UNLIKELY(proc->pc % IALIGN != 0)) {
 		err_log("pc (0x%lx) is not bit-aligned to IALIGN (%u)",
 			proc->pc, IALIGN * 8);
 		panic("Instruction-address-misaligned exception");
@@ -525,7 +525,7 @@ int insn_jalr(struct proc *proc, insn_t insn)
 
 	// Cycle always adds size of current instruction
 	proc->pc = (rvaddr_t)(getreg(proc, rs1) + imm - 4);
-	if (proc->pc % IALIGN != 0) {
+	if (UNLIKELY(proc->pc % IALIGN != 0)) {
 		err_log("pc (0x%lx) is not bit-aligned to IALIGN (%u)",
 			proc->pc, IALIGN * 8);
 		panic("Instruction-address-misaligned exception");
@@ -547,7 +547,7 @@ int insn_beq(struct proc *proc, insn_t insn)
 	if (getreg(proc, rs1) == getreg(proc, rs2)) {
 		// Cycle always adds size of current instruction
 		proc->pc += imm - 4;
-		if (proc->pc % IALIGN != 0) {
+		if (UNLIKELY(proc->pc % IALIGN != 0)) {
 			err_log("pc (0x%lx) is not bit-aligned to IALIGN (%u)",
 				proc->pc, IALIGN * 8);
 			panic("Instruction-address-misaligned exception");
@@ -571,7 +571,7 @@ int insn_bne(struct proc *proc, insn_t insn)
 	if (getreg(proc, rs1) != getreg(proc, rs2)) {
 		// Cycle always adds size of current instruction
 		proc->pc += imm - 4;
-		if (proc->pc % IALIGN != 0) {
+		if (UNLIKELY(proc->pc % IALIGN != 0)) {
 			err_log("pc (0x%lx) is not bit-aligned to IALIGN (%u)",
 				proc->pc, IALIGN * 8);
 			panic("Instruction-address-misaligned exception");
@@ -595,7 +595,7 @@ int insn_blt(struct proc *proc, insn_t insn)
 	if ((ireg_t)getreg(proc, rs1) < (ireg_t)getreg(proc, rs2)) {
 		// Cycle always adds size of current instruction
 		proc->pc += imm - 4;
-		if (proc->pc % IALIGN != 0) {
+		if (UNLIKELY(proc->pc % IALIGN != 0)) {
 			err_log("pc (0x%lx) is not bit-aligned to IALIGN (%u)",
 				proc->pc, IALIGN * 8);
 			panic("Instruction-address-misaligned exception");
@@ -619,7 +619,7 @@ int insn_bltu(struct proc *proc, insn_t insn)
 	if ((ureg_t)getreg(proc, rs1) < (ureg_t)getreg(proc, rs2)) {
 		// Cycle always adds size of current instruction
 		proc->pc += imm - 4;
-		if (proc->pc % IALIGN != 0) {
+		if (UNLIKELY(proc->pc % IALIGN != 0)) {
 			err_log("pc (0x%lx) is not bit-aligned to IALIGN (%u)",
 				proc->pc, IALIGN * 8);
 			panic("Instruction-address-misaligned exception");
@@ -643,7 +643,7 @@ int insn_bge(struct proc *proc, insn_t insn)
 	if ((ireg_t)getreg(proc, rs1) > (ireg_t)getreg(proc, rs2)) {
 		// Cycle always adds size of current instruction
 		proc->pc += imm - 4;
-		if (proc->pc % IALIGN != 0) {
+		if (UNLIKELY(proc->pc % IALIGN != 0)) {
 			err_log("pc (0x%lx) is not bit-aligned to IALIGN (%u)",
 				proc->pc, IALIGN * 8);
 			panic("Instruction-address-misaligned exception");
@@ -667,7 +667,7 @@ int insn_bgeu(struct proc *proc, insn_t insn)
 	if ((ureg_t)getreg(proc, rs1) > (ureg_t)getreg(proc, rs2)) {
 		// Cycle always adds size of current instruction
 		proc->pc += imm - 4;
-		if (proc->pc % IALIGN != 0) {
+		if (UNLIKELY(proc->pc % IALIGN != 0)) {
 			err_log("pc (0x%lx) is not bit-aligned to IALIGN (%u)",
 				proc->pc, IALIGN * 8);
 			panic("Instruction-address-misaligned exception");
@@ -685,7 +685,7 @@ int insn_lb(struct proc *proc, insn_t insn)
 	uint8_t val;
 
 	I_getfields(insn, &rd, &rs1, &imm);
-	if (memload(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1) {
+	if (UNLIKELY(memload(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1)) {
 		err_log("lb: Could not load address 0x%lx: %s",
 			getreg(proc, rs1) + imm, strerror(errno));
 		return -1;
@@ -705,7 +705,7 @@ int insn_lh(struct proc *proc, insn_t insn)
 	uint16_t val;
 
 	I_getfields(insn, &rd, &rs1, &imm);
-	if (memload(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1) {
+	if (UNLIKELY(memload(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1)) {
 		err_log("lh: Could not load address 0x%lx: %s",
 			getreg(proc, rs1) + imm, strerror(errno));
 		return -1;
@@ -725,7 +725,7 @@ int insn_lw(struct proc *proc, insn_t insn)
 	uint32_t val;
 
 	I_getfields(insn, &rd, &rs1, &imm);
-	if (memload(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1) {
+	if (UNLIKELY(memload(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1)) {
 		err_log("lw: Could not load address 0x%lx: %s",
 			getreg(proc, rs1) + imm, strerror(errno));
 		return -1;
@@ -745,7 +745,7 @@ int insn_ld(struct proc *proc, insn_t insn)
 	uint64_t val;
 
 	I_getfields(insn, &rd, &rs1, &imm);
-	if (memload(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1) {
+	if (UNLIKELY(memload(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1)) {
 		err_log("ld: Could not load address 0x%lx: %s",
 			getreg(proc, rs1) + imm, strerror(errno));
 		return -1;
@@ -765,7 +765,7 @@ int insn_lwu(struct proc *proc, insn_t insn)
 	uint32_t val;
 
 	I_getfields(insn, &rd, &rs1, &imm);
-	if (memload(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1) {
+	if (UNLIKELY(memload(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1)) {
 		err_log("lwu: Could not load address 0x%lx: %s",
 			getreg(proc, rs1) + imm, strerror(errno));
 		return -1;
@@ -785,7 +785,7 @@ int insn_lhu(struct proc *proc, insn_t insn)
 	uint16_t val;
 
 	I_getfields(insn, &rd, &rs1, &imm);
-	if (memload(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1) {
+	if (UNLIKELY(memload(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1)) {
 		err_log("lhu: Could not load address 0x%lx: %s",
 			getreg(proc, rs1) + imm, strerror(errno));
 		return -1;
@@ -805,7 +805,7 @@ int insn_lbu(struct proc *proc, insn_t insn)
 	uint8_t val;
 
 	I_getfields(insn, &rd, &rs1, &imm);
-	if (memload(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1) {
+	if (UNLIKELY(memload(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1)) {
 		err_log("lbu: Could not load address 0x%lx: %s",
 			getreg(proc, rs1) + imm, strerror(errno));
 		return -1;
@@ -829,7 +829,7 @@ int insn_sb(struct proc *proc, insn_t insn)
 
 	dbg_log("0x%lx: sb: Storing %hhu from %s into 0x%lx", (unsigned long)proc->pc,
 		val, reg2abi(rs2), getreg(proc, rs1) + imm);
-	if (memstore(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1) {
+	if (UNLIKELY(memstore(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1)) {
 		err_log("sb: Could not store address 0x%lx: %s",
 			getreg(proc, rs1) + imm, strerror(errno));
 		return -1;
@@ -850,7 +850,7 @@ int insn_sh(struct proc *proc, insn_t insn)
 
 	dbg_log("0x%lx: sh: Storing %hu from %s into 0x%lx", (unsigned long)proc->pc,
 		val, reg2abi(rs2), getreg(proc, rs1) + imm);
-	if (memstore(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1) {
+	if (UNLIKELY(memstore(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1)) {
 		err_log("sh: Could not store address 0x%lx: %s",
 			getreg(proc, rs1) + imm, strerror(errno));
 		return -1;
@@ -871,7 +871,7 @@ int insn_sw(struct proc *proc, insn_t insn)
 
 	dbg_log("0x%lx: sw: Storing %u from %s into 0x%lx", (unsigned long)proc->pc,
 		val, reg2abi(rs2), getreg(proc, rs1) + imm);
-	if (memstore(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1) {
+	if (UNLIKELY(memstore(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1)) {
 		err_log("sw: Could not store address 0x%lx: %s",
 			getreg(proc, rs1) + imm, strerror(errno));
 		return -1;
@@ -892,7 +892,7 @@ int insn_sd(struct proc *proc, insn_t insn)
 
 	dbg_log("0x%lx: sd: Storing %lu from %s into 0x%lx", (unsigned long)proc->pc,
 		val, reg2abi(rs2), getreg(proc, rs1) + imm);
-	if (memstore(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1) {
+	if (UNLIKELY(memstore(proc->mem, (rvaddr_t)(getreg(proc, rs1) + imm), &val) == -1)) {
 		err_log("sd: Could not store address 0x%lx: %s",
 			getreg(proc, rs1) + imm, strerror(errno));
 		return -1;

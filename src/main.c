@@ -58,19 +58,19 @@ static int exec_cycle(struct proc *proc)
 	errno = 0;
 	while (!proc->exitinfo.exited) {
 		pc_skip = insn_fetch(proc, &insn);
-		if (pc_skip == -1) {
+		if (UNLIKELY(pc_skip == -1)) {
 			err_log("Can't fetch insn at 0x%lx: %s", proc->pc,
 				strerror(errno));
 			return 1;
 		}
 
 		insn_func = insn_decode(insn);
-		if (!insn_func) {
+		if (UNLIKELY(!insn_func)) {
 			err_log("Can't decode 0x%x at pc 0x%lx", insn, proc->pc);
 			return 1;
 		}
 
-		if (insn_func(proc, insn) != 0) {
+		if (UNLIKELY(insn_func(proc, insn) != 0)) {
 			err_log("Can't execute insn 0x%x at pc 0x%lx: %s",
 				insn, proc->pc, strerror(errno));
 			return 1;

@@ -48,22 +48,16 @@ int load_argv_and_envp(struct proc *proc, char **argv, char **envp) ATTRIBUTE(no
 static inline void mvreg(struct proc *proc, enum ABI_REG reg, reg_t val) ATTRIBUTE(nonnull);
 static inline reg_t getreg(const struct proc *proc, enum ABI_REG reg) ATTRIBUTE(nonnull);
 
-#include "debug.h"
+#include <assert.h>
 static inline void mvreg(struct proc *proc, enum ABI_REG reg, reg_t val)
 {
-	if (reg > 32) {
-		err_log("Invalid Register x%d", reg);
-		panic("Tried to access inexistent register");
-	}
+	assert(reg >= 0 && reg < 32);
 	proc->regs[reg] = (reg ? val : 0);
 }
 
 static inline reg_t getreg(const struct proc *proc, enum ABI_REG reg)
 {
-	if (reg > 32) {
-		err_log("Invalid Register x%d", reg);
-		panic("Tried to access inexistent register");
-	}
+	assert(reg >= 0 && reg < 32);
 	return (reg ? proc->regs[reg] : 0);
 }
 
