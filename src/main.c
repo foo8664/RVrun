@@ -15,6 +15,7 @@
 #include "proc.h"
 #include "insn.h"
 #include "config.h"
+#include "common.h"
 
 // Von Neumann fetch-decode-exec cycle, returns non-zero at error
 static int exec_cycle(struct proc *proc) __attribute__((nonnull, cold));
@@ -119,7 +120,7 @@ static void setcfg(int argc, char **argv)
 
 	static struct rvconfig cfg = {
 		.optstring = "+",
-		.size = sizeof(opts) / sizeof(*opts),
+		.size = ARRAY_SIZE(opts),
 		.opts = opts,
 	};
 
