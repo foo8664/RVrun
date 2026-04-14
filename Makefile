@@ -9,7 +9,7 @@ PREFIX ?= /usr/local
 src = src
 headers = include
 
-CC = gcc
+CC = cc
 CFLAGS = -Wall -Werror -Wextra -Wconversion
 CFLAGS += -std=c11 -pedantic-errors -D_GNU_SOURCE
 CFLAGS += -I$(headers)

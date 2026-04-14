@@ -14,19 +14,20 @@
 #ifdef __x86_64__
 # define HAVE_RV64M
 
-int insn_mul(struct proc *proc, insn_t insn)	__attribute__((nonnull));
-int insn_mulw(struct proc *proc, insn_t insn)	__attribute__((nonnull));
-int insn_mulh(struct proc *proc, insn_t insn)	__attribute__((nonnull));
-int insn_mulhu(struct proc *proc, insn_t insn)	__attribute__((nonnull));
-int insn_mulhsu(struct proc *proc, insn_t insn)	__attribute__((nonnull));
-int insn_div(struct proc *proc, insn_t insn)	__attribute__((nonnull));
-int insn_divu(struct proc *proc, insn_t insn)	__attribute__((nonnull));
-int insn_divw(struct proc *proc, insn_t insn)	__attribute__((nonnull));
-int insn_divuw(struct proc *proc, insn_t insn)	__attribute__((nonnull));
-int insn_rem(struct proc *proc, insn_t insn)	__attribute__((nonnull));
-int insn_remu(struct proc *proc, insn_t insn)	__attribute__((nonnull));
-int insn_remw(struct proc *proc, insn_t insn)	__attribute__((nonnull));
-int insn_remuw(struct proc *proc, insn_t insn)	__attribute__((nonnull));
+#include "common.h"
+int insn_mul(struct proc *proc, insn_t insn)	ATTRIBUTE(nonnull);
+int insn_mulw(struct proc *proc, insn_t insn)	ATTRIBUTE(nonnull);
+int insn_mulh(struct proc *proc, insn_t insn)	ATTRIBUTE(nonnull);
+int insn_mulhu(struct proc *proc, insn_t insn)	ATTRIBUTE(nonnull);
+int insn_mulhsu(struct proc *proc, insn_t insn)	ATTRIBUTE(nonnull);
+int insn_div(struct proc *proc, insn_t insn)	ATTRIBUTE(nonnull);
+int insn_divu(struct proc *proc, insn_t insn)	ATTRIBUTE(nonnull);
+int insn_divw(struct proc *proc, insn_t insn)	ATTRIBUTE(nonnull);
+int insn_divuw(struct proc *proc, insn_t insn)	ATTRIBUTE(nonnull);
+int insn_rem(struct proc *proc, insn_t insn)	ATTRIBUTE(nonnull);
+int insn_remu(struct proc *proc, insn_t insn)	ATTRIBUTE(nonnull);
+int insn_remw(struct proc *proc, insn_t insn)	ATTRIBUTE(nonnull);
+int insn_remuw(struct proc *proc, insn_t insn)	ATTRIBUTE(nonnull);
 
 #else
 # warning "The M extension is only currently supported for AMD64 (aka x86-64) machines"

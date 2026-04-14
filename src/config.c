@@ -15,17 +15,18 @@
 #include <fcntl.h>
 #include <errno.h>
 #include "debug.h"
+#include "common.h"
 
 static struct rvconfig *_rvglobalcfg = NULL;
 
 // Free's an option
-static void freeopt(struct optpair *pair) __attribute__((nonnull));
+static void freeopt(struct optpair *pair) ATTRIBUTE(nonnull);
 
 // Displays a help message and then exits
-static void help(struct rvconfig *cfg) __attribute__((nonnull, noreturn));
+static void help(struct rvconfig *cfg) ATTRIBUTE(nonnull, noreturn);
 
 // Displays version message and exits
-static void version(void) __attribute__((noreturn));
+static void version(void) ATTRIBUTE(noreturn);
 
 void cleancfg(struct rvconfig *cfg)
 {

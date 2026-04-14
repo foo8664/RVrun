@@ -17,7 +17,7 @@
 #define ARRAY_SIZE(arr) (sizeof(arr) / (sizeof(*(arr))))
 
 // Branch prediction optimizations
-#if defined(__clang__) || defined(__GNUC__)
+#ifdef __GNUC__
 # define LIKELY(x)	(__builtin_expect(!!(x), 1))
 # define UNLIKELY(x)	(__builtin_expect(!!(x), 0))
 #else
@@ -25,8 +25,11 @@
 # define UNLIKELY(x)	(x)
 #endif
 
-// Using __attribute__ portably
-#if defined(__clang__) || defined(__GNUC__)
+/*
+ * Using __attribute__ portably. Clang does support the __attribute__(()) feature,
+ * but many of the ones used in the code are simply not supported.
+ */
+#if defined(__GNUC__) && !defined(__llvm__) && !defined(__INTEL_COMPILER__)
 # define ATTRIBUTE(...) __attribute__((__VA_ARGS__))
 #else
 # define ATTRIBUTE(...)
@@ -40,7 +43,7 @@
 #define PREFETCH_LOWTMP 1
 #define PREFETCH_MODERATETMP 2
 #define PREFETCH_HIGHTMP 3
-#if defined(__clang__) || defined(__GNUC__)
+#ifdef __GNUC__
 # define PREFETCH(addr, ...) (__builtin_prefetch(addr, __VA_ARGS__))
 #else
 # define PREFETCH(addr, ...)

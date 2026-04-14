@@ -18,9 +18,9 @@
 #include "common.h"
 
 // Von Neumann fetch-decode-exec cycle, returns non-zero at error
-static int exec_cycle(struct proc *proc) __attribute__((nonnull, cold));
+static int exec_cycle(struct proc *proc) ATTRIBUTE(nonnull, cold);
 // Parses options and sets globalcfg from config.h
-static void setcfg(int argc, char **argv) __attribute__((nonnull, cold));
+static void setcfg(int argc, char **argv) ATTRIBUTE(nonnull, cold);
 
 int main(int argc, char **argv, char **envp)
 {

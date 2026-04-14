@@ -12,6 +12,7 @@
 #include "riscv.h"
 #include "proc.h"
 #include "debug.h"
+#include "common.h"
 #include "rv_i.h"
 
 #include "memory.h"
@@ -24,17 +25,17 @@
 
 // Get info from OP-Code fields
 static inline void R_getfields(insn_t insn, enum ABI_REG *rd, enum ABI_REG *rs1,
-			       enum ABI_REG *rs2) __attribute__((nonnull));
+			       enum ABI_REG *rs2) ATTRIBUTE(nonnull);
 static inline void I_getfields(insn_t insn, enum ABI_REG *rd, enum ABI_REG *rs1,
-			       uint64_t *imm)	__attribute__((nonnull));
+			       uint64_t *imm) ATTRIBUTE(nonnull);
 static inline void U_getfields(insn_t insn, enum ABI_REG *rd, uint64_t *imm)
-						__attribute__((nonnull));
+				ATTRIBUTE(nonnull);
 static inline void J_getfields(insn_t insn, enum ABI_REG *rd, uint64_t *imm)
-						__attribute__((nonnull));
+				ATTRIBUTE(nonnull);
 static inline void B_getfields(insn_t insn, enum ABI_REG *rs1, enum ABI_REG *rs2,
-			       uint64_t *imm)	__attribute__((nonnull));
+			       uint64_t *imm) ATTRIBUTE(nonnull);
 static inline void S_getfields(insn_t insn, enum ABI_REG *rs1, enum ABI_REG *rs2,
-		               uint64_t *imm)	__attribute__((nonnull));
+		               uint64_t *imm) ATTRIBUTE(nonnull);
 
 
 static inline void R_getfields(insn_t insn, enum ABI_REG *rd, enum ABI_REG *rs1,
@@ -911,7 +912,7 @@ int insn_fence(struct proc *proc, insn_t insn)
 
 int insn_ebreak(struct proc *proc, insn_t insn)
 {
-	int i;
+	enum ABI_REG i;
 
 	(void)insn;
 

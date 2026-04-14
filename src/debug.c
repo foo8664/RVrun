@@ -12,9 +12,9 @@
 #include "debug.h"
 
 static FILE *logfile = NULL;
-static enum LOGLEVEL loglevel = -1;
+static enum LOGLEVEL loglevel = DBG_LOGLEVEL;
 
-void setdbgcfg()
+void setdbgcfg(void)
 {
 	struct rvopt *opt;
 

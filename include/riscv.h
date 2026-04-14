@@ -53,8 +53,10 @@ enum ABI_REG {
 	REG_T6,
 };
 
+#include "common.h"
+
 // Convert register number to abi name
-const char *reg2abi(enum ABI_REG r) __attribute__((const, leaf));
+const char *reg2abi(enum ABI_REG r) ATTRIBUTE(const, leaf);
 
 // Sign-extend/Zero-extend values
 static inline uint64_t extend32to64(uint32_t i32);

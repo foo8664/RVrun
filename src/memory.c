@@ -11,23 +11,24 @@
 #include <stdint.h>
 #include "riscv.h"
 #include "memory.h"
+#include "common.h"
 
 static inline void memload8(struct memseg *seg, rvaddr_t addr, uint8_t *in)
-	__attribute__((nonnull));
+	ATTRIBUTE(nonnull);
 static inline void memload16(struct memseg *seg, rvaddr_t addr, uint16_t *in)
-	__attribute__((nonnull));
+	ATTRIBUTE(nonnull);
 static inline void memload32(struct memseg *seg, rvaddr_t addr, uint32_t *in)
-	__attribute__((nonnull));
+	ATTRIBUTE(nonnull);
 static inline void memload64(struct memseg *seg, rvaddr_t addr, uint64_t *in)
-	__attribute__((nonnull));
+	ATTRIBUTE(nonnull);
 static inline void memstore8(struct memseg *seg, rvaddr_t addr, uint8_t in)
-	__attribute__((nonnull));
+	ATTRIBUTE(nonnull);
 static inline void memstore16(struct memseg *seg, rvaddr_t addr, uint16_t in)
-	__attribute__((nonnull));
+	ATTRIBUTE(nonnull);
 static inline void memstore32(struct memseg *seg, rvaddr_t addr, uint32_t in)
-	__attribute__((nonnull));
+	ATTRIBUTE(nonnull);
 static inline void memstore64(struct memseg *seg, rvaddr_t addr, uint64_t in)
-	__attribute__((nonnull));
+	ATTRIBUTE(nonnull);
 
 struct memseg *addseg(struct memory *mem, rvaddr_t start, rvaddr_t end,
 		      uint8_t flags)

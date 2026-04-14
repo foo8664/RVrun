@@ -25,20 +25,21 @@
 
 #include <errno.h>
 #include "debug.h"
+#include "common.h"
 
 
 static int elfparse(FILE *file, struct proc *proc, const char *path)
-					__attribute__((nonnull, cold));
+	ATTRIBUTE(nonnull, cold);
 static int loadseg(FILE *fp, Elf64_Phdr elfph, struct proc *proc)
-					__attribute__((nonnull, cold));
-static int loadstack(struct proc *proc)	__attribute__((nonnull, cold));
-static int loadfds(struct proc *proc)	__attribute__((nonnull, cold));
+	ATTRIBUTE(nonnull, cold);
+static int loadstack(struct proc *proc) ATTRIBUTE(nonnull, cold);
+static int loadfds(struct proc *proc) ATTRIBUTE(nonnull, cold);
 static int loadargv(struct proc *proc, struct memseg *stack, size_t argc, char **argv)
-	__attribute__((nonnull(1, 2), nonnull_if_nonzero(4, 3), cold));
+	ATTRIBUTE(nonnull(1, 2), nonnull_if_nonzero(4, 3), cold);
 static int loadenvp(struct proc *proc, struct memseg *stack, size_t envc, char **envp)
-	__attribute__((nonnull(1, 2), nonnull_if_nonzero(4, 3), cold));
+	ATTRIBUTE(nonnull(1, 2), nonnull_if_nonzero(4, 3), cold);
 static inline size_t memend(struct proc *proc, struct memseg *stack)
-	__attribute__((nonnull));
+	ATTRIBUTE(nonnull);
 
 
 struct proc *loadproc(const char *path)

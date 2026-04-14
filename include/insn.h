@@ -13,12 +13,14 @@
 
 #include "riscv.h"
 #include "proc.h"
+#include "common.h"
+
 /*
  * fetches the next instruction from a process and returns it's size in bytes,
  * will return -1 and set errno if it fails, analogous to memload() but checks
  * for the MEM_EXEC flag, and `addr` is `proc->pc`.
  */
-int insn_fetch(struct proc *proc, insn_t *insn) __attribute__((nonnull));
+int insn_fetch(struct proc *proc, insn_t *insn) ATTRIBUTE(nonnull);
 
 /*
  * Decodes an instruction and returns the function that simulates it, will

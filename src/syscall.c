@@ -12,6 +12,7 @@
 #include "proc.h"
 #include "syscall.h"
 #include "debug.h"
+#include "common.h"
 
 // To call system calls
 #include <sys/syscall.h>
@@ -20,11 +21,10 @@
 
 
 static void *getbuff(struct proc *proc, rvaddr_t start, size_t n,
-		     enum memflags pmask, enum memflags pmatch)
-		   __attribute__((nonnull));
+		     enum memflags pmask, enum memflags pmatch) ATTRIBUTE(nonnull);
 
 static char *getstr(struct proc *proc, rvaddr_t start, enum memflags pmask,
-		    enum memflags pmatch) __attribute__((nonnull, malloc(free)));
+		    enum memflags pmatch) ATTRIBUTE(nonnull, malloc(free));
 
 // Delegate the process freeing to the execution loop, allows cleaner exits
 int rvsys_exit(struct proc *proc)

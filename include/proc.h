@@ -33,22 +33,20 @@ struct proc {
 	struct fdinfo fdinfo;
 };
 
+#include "common.h"
+
 // Free's a process allocated by loadproc
-void freeproc(struct proc *proc) __attribute__((nonnull, cold));
+void freeproc(struct proc *proc) ATTRIBUTE(nonnull, cold);
 
 // Loades a process from an ELF file
-struct proc *loadproc(const char *path)
-	__attribute__((nonnull, cold, malloc(freeproc, 1)));
+struct proc *loadproc(const char *path) ATTRIBUTE(nonnull, cold, malloc(freeproc, 1));
 
 // Loads a processes argv and envp. argv should not contain RvRun's arguments
-int load_argv_and_envp(struct proc *proc, char **argv, char **envp)
-	__attribute__((nonnull, cold));
+int load_argv_and_envp(struct proc *proc, char **argv, char **envp) ATTRIBUTE(nonnull, cold);
 
 // set and get a process's registers
-static inline void mvreg(struct proc *proc, enum ABI_REG reg, reg_t val)
-	__attribute__((nonnull));
-static inline reg_t getreg(const struct proc *proc, enum ABI_REG reg)
-	__attribute__((nonnull));
+static inline void mvreg(struct proc *proc, enum ABI_REG reg, reg_t val) ATTRIBUTE(nonnull);
+static inline reg_t getreg(const struct proc *proc, enum ABI_REG reg) ATTRIBUTE(nonnull);
 
 #include "debug.h"
 static inline void mvreg(struct proc *proc, enum ABI_REG reg, reg_t val)

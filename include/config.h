@@ -56,22 +56,23 @@ struct rvconfig {
 	} *opts;
 };
 
+#include "common.h"
+
 /*
  * Cleans a config created by a call parsecfg(), does not free either cfg
  * or cfg->opts, as they may not be dynamically allocated.
  */
-void cleancfg(struct rvconfig *cfg) __attribute__((nonnull));
+void cleancfg(struct rvconfig *cfg) ATTRIBUTE(nonnull);
 
 // Parses argv and creates a config to be used by the program
 void parsecfg(struct rvconfig *cfg, int argc, char **argv)
-	__attribute__((nonnull));
+	ATTRIBUTE(nonnull);
 
 // Returns the pointer to a specific option in a config
-struct rvopt *getcfgopt(struct rvconfig *cfg, enum RVOPT type)
-	__attribute__((nonnull));
+struct rvopt *getcfgopt(struct rvconfig *cfg, enum RVOPT type) ATTRIBUTE(nonnull);
 
 // Sets a config as the global one
-void set_globalcfg(struct rvconfig *cfg) __attribute__((nonnull));
+void set_globalcfg(struct rvconfig *cfg) ATTRIBUTE(nonnull);
 
 // Access the program's global config as the globalcfg "variable"
 struct rvconfig *get_globalcfg(void);
