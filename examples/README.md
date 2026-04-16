@@ -30,6 +30,8 @@ To delete all of the object files and binaries
  * echo
  * cat
  * xxd
+ * fib (input a number n, prints the n-th number in the fibonacci sequence)
+ * gcd (input two numbers, prints the greatest common divisor between them)
 
 These programs should be available at any modern linux system, with man pages!
 The current examples cannot take any flags to modify behaviour, but they do take arguments
