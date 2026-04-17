@@ -10,8 +10,8 @@
 .type main, @function
 main:
 	addi sp, sp, -16
-	sd s0, 8(sp)
-	sd ra, 16(sp)
+	sd s0, 0(sp)
+	sd ra, 8(sp)
 
 	addi s0, a1, 8
 .loop:
@@ -28,8 +28,8 @@ main:
 	la a0, newline_str
 	call print
 
-	ld s0, 8(sp)
-	ld ra, 16(sp)
+	ld s0, 0(sp)
+	ld ra, 8(sp)
 	addi sp, sp, 16
 	li a0, 0
 	ret

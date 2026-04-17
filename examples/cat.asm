@@ -12,10 +12,10 @@ main:
 	addi sp, sp, -2048
 	addi sp, sp, -2048
 	addi sp, sp, -32
-	sd ra, 8(sp)
-	sd s0, 16(sp)
-	sd s1, 24(sp)
-	sd s2, 32(sp)
+	sd ra, 0(sp)
+	sd s0, 8(sp)
+	sd s1, 16(sp)
+	sd s2, 24(sp)
 
 	addi s0, a1, 8
 .loop:
@@ -29,7 +29,7 @@ main:
 	blt s1, zero, .open_err
 .cat_loop:
 	mv a0, s1
-	addi a1, sp, 32
+	addi a1, sp, 24
 	li a2, 4096
 	call read
 	blt a0, zero, .read_err
@@ -37,7 +37,7 @@ main:
 
 	mv s2, a0
 	mv a2, s2
-	addi a1, sp, 32
+	addi a1, sp, 24
 	li a0, 1
 	call write
 	bne s2, a0, .write_err
@@ -48,13 +48,13 @@ main:
 	j .loop
 .end_loop:
 
-	ld ra, 8(sp)
-	ld s0, 16(sp)
-	ld s1, 24(sp)
-	ld s2, 32(sp)
+	ld ra, 0(sp)
+	ld s0, 8(sp)
+	ld s1, 16(sp)
+	ld s2, 24(sp)
 	addi sp, sp, 2047
 	addi sp, sp, 2047
-	addi sp, sp, 34
+	addi sp, sp, 26
 	li a0, 0
 	ret
 

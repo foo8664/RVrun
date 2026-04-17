@@ -10,9 +10,9 @@
 .type main, @function
 main:
 	addi sp, sp, -72
-	sd ra, 8(sp)
-	sd s0, 16(sp)
-	sd s1, 24(sp)
+	sd ra, 0(sp)
+	sd s0, 8(sp)
+	sd s1, 16(sp)
 
 	addi s0, a1, 8
 
@@ -24,20 +24,20 @@ main:
 	blt s1, zero, .open_err
 .loop:
 	mv a0, s1
-	addi a1, sp, 41
+	addi a1, sp, 33
 	li a2, 8
 	call read
 	blt a0, zero, .read_err
 	beq a0, zero, .end_loop
 
-	addi a1, sp, 41
+	addi a1, sp, 33
 	add a1, a1, a0
 	sb zero, 0(a1)
-	addi a0, sp, 41
-	addi a1, sp, 66
+	addi a0, sp, 33
+	addi a1, sp, 58
 	call hexstr
 
-	addi a0, sp, 66
+	addi a0, sp, 58
 	call print
 	la a0, newline
 	call print
@@ -46,9 +46,9 @@ main:
 	mv a0, s1
 	call close
 
-	ld ra, 8(sp)
-	ld s0, 16(sp)
-	ld s1, 24(sp)
+	ld ra, 0(sp)
+	ld s0, 8(sp)
+	ld s1, 16(sp)
 	addi sp, sp, 72
 	li a0, 0
 	ret
@@ -75,7 +75,7 @@ hexstr:
 	beq t0, zero, .hexstr_end_loop
 	li t1, 9
 	and t2, t0, 0x0f
-	bge t2, t1, .hexstr_hexchar1
+	blt t1, t2, .hexstr_hexchar1
 .hexstr_hexnum1:
 	addi t2, t2, 0x30 # '0'
 	sb t2, 1(a1)
@@ -88,7 +88,7 @@ hexstr:
 .hexstr_hex2:
 	and t2, t0, 0xf0
 	srli t2, t2, 4
-	bge t2, t1, .hexstr_hexchar2
+	blt t1, t2, .hexstr_hexchar2
 .hexstr_hexnum2:
 	addi t2, t2, 0x30 # '0'
 	sb t2, 0(a1)

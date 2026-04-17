@@ -20,8 +20,8 @@ _start:
 .globl print
 print:
 	addi sp, sp, -16
-	sd s0, 8(sp)
-	sd ra, 16(sp)
+	sd s0, 0(sp)
+	sd ra, 8(sp)
 
 	mv s0, a0
 	call strlen
@@ -30,8 +30,8 @@ print:
 	mv a1, s0
 	call write
 
-	ld s0, 8(sp)
-	ld ra, 16(sp)
+	ld s0, 0(sp)
+	ld ra, 8(sp)
 	addi sp, sp, 16
 	ret
 
@@ -40,9 +40,9 @@ print:
 .globl printnum
 printnum:
 	addi sp, sp, -64
-	sd ra, 8(sp)
+	sd ra, 0(sp)
 
-	addi a1, sp, 16
+	addi a1, sp, 8
 	li t0, 10
 .printnum_loop:
 	beq a0, zero, .printnum_endloop
@@ -55,13 +55,13 @@ printnum:
 	j .printnum_loop
 .printnum_endloop:
 	sb zero, 0(a1)
-	addi a0, sp, 16
+	addi a0, sp, 8
 	addi a1, a1, -1
 	call reverse
-	addi a0, sp, 16
+	addi a0, sp, 8
 	call print
 
-	ld ra, 8(sp)
+	ld ra, 0(sp)
 	addi sp, sp, 64
 	ret
 
