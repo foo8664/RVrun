@@ -32,7 +32,7 @@ void setdbgcfg(void)
 	if ((opt = getcfgopt(&globalcfg, CFG_LOGLEVEL)) && opt->set)
 		loglevel = (enum LOGLEVEL)opt->u.uint;
 	else
-		loglevel = INFO_LOGLEVEL;
+		loglevel = ERR_LOGLEVEL;
 }
 
 void dbg_log(const char *restrict fmt, ...)
