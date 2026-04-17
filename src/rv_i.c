@@ -640,7 +640,7 @@ int insn_bge(struct proc *proc, insn_t insn)
 		reg2abi(rs1), getreg(proc, rs1), reg2abi(rs2), getreg(proc, rs2),
 		proc->pc, imm);
 
-	if ((ireg_t)getreg(proc, rs1) > (ireg_t)getreg(proc, rs2)) {
+	if ((ireg_t)getreg(proc, rs1) >= (ireg_t)getreg(proc, rs2)) {
 		// Cycle always adds size of current instruction
 		proc->pc += imm - 4;
 		if (UNLIKELY(proc->pc % IALIGN != 0)) {
@@ -664,7 +664,7 @@ int insn_bgeu(struct proc *proc, insn_t insn)
 		reg2abi(rs1), getreg(proc, rs1), reg2abi(rs2), getreg(proc, rs2),
 		proc->pc, imm);
 
-	if ((ureg_t)getreg(proc, rs1) > (ureg_t)getreg(proc, rs2)) {
+	if ((ureg_t)getreg(proc, rs1) >= (ureg_t)getreg(proc, rs2)) {
 		// Cycle always adds size of current instruction
 		proc->pc += imm - 4;
 		if (UNLIKELY(proc->pc % IALIGN != 0)) {
