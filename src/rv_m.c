@@ -59,9 +59,6 @@ int insn_mul(struct proc *proc, insn_t insn)
 	getfields(insn, &rd, &rs1, &rs2);
 	mvreg(proc, rd, (reg_t)((int64_t)getreg(proc, rs1) * (int64_t)getreg(proc, rs2)));
 
-	dbg_log("0x%lx: mul: %s (%ld) = %s (%ld) * %s (%ld)", proc->pc, reg2abi(rd),
-		getreg(proc, rd), reg2abi(rs1), getreg(proc, rs1), reg2abi(rs2),
-		getreg(proc, rs2));
 	return 0;
 }
 
@@ -75,9 +72,6 @@ int insn_mulw(struct proc *proc, insn_t insn)
 	mvreg(proc, rd, (reg_t)extend32to64((uint32_t)((int32_t)getreg(proc, rs1) *
 						       (int32_t)getreg(proc, rs2))));
 
-	dbg_log("0x%lx: mulw: %s (%ld) = (%s (%ld) * %s (%ld))", proc->pc,
-		reg2abi(rd), getreg(proc, rd), reg2abi(rs1), getreg(proc, rs1),
-		reg2abi(rs2), getreg(proc, rs2));
 	return 0;
 }
 
@@ -90,9 +84,6 @@ int insn_mulh(struct proc *proc, insn_t insn)
 	getfields(insn, &rd, &rs1, &rs2);
 	mvreg(proc, rd, (reg_t)(imulh((int64_t)getreg(proc, rs1),
 				      (int64_t)getreg(proc, rs2))));
-	dbg_log("0x%lx: mulh: %s (%ld) = %s (%ld) * %s (%ld)", proc->pc,
-		reg2abi(rd), getreg(proc, rd), reg2abi(rs1), getreg(proc, rs1),
-		reg2abi(rs2), getreg(proc, rs2));
 	return 0;
 }
 
@@ -106,9 +97,6 @@ int insn_mulhu(struct proc *proc, insn_t insn)
 	mvreg(proc, rd, (reg_t)(umulh((uint64_t)getreg(proc, rs1),
 				      (uint64_t)getreg(proc, rs2))));
 
-	dbg_log("0x%lx: mulhu: %s (%lu) = %s (%lu) * %s (%lu)", proc->pc,
-		reg2abi(rd), getreg(proc, rd), reg2abi(rs1), getreg(proc, rs1),
-		reg2abi(rs2), getreg(proc, rs2));
 	return 0;
 }
 
@@ -128,9 +116,6 @@ int insn_mulhsu(struct proc *proc, insn_t insn)
 					      (uint64_t)getreg(proc, rs2))));
 	}
 
-	dbg_log("0x%lx: mulhsu: %s (%ld) = %s (%ld) * %s (%lu)", proc->pc,
-		reg2abi(rd), getreg(proc, rd), reg2abi(rs1), getreg(proc, rs1),
-		reg2abi(rs2), getreg(proc, rs2));
 	return 0;
 }
 
@@ -155,9 +140,6 @@ int insn_div(struct proc *proc, insn_t insn)
 	}
 
 	mvreg(proc, rd, (reg_t)((int64_t)getreg(proc, rs1) / (int64_t)getreg(proc, rs2)));
-	dbg_log("0x%lx: div: %s (%ld) = %s (%ld) / %s (%ld)", proc->pc,
-		reg2abi(rd), getreg(proc, rd), reg2abi(rs1), getreg(proc, rs1),
-		reg2abi(rs2), getreg(proc, rs2));
 	return 0;
 }
 
@@ -176,9 +158,6 @@ int insn_divu(struct proc *proc, insn_t insn)
 	}
 
 	mvreg(proc, rd, (reg_t)((uint64_t)getreg(proc, rs1) / (uint64_t)getreg(proc, rs2)));
-	dbg_log("0x%lx: divu: %s (%lu) = %s (%lu) / %s (%lu)", proc->pc,
-		reg2abi(rd), getreg(proc, rd), reg2abi(rs1), getreg(proc, rs1),
-		reg2abi(rs2), getreg(proc, rs2));
 	return 0;
 }
 
@@ -204,9 +183,6 @@ int insn_divw(struct proc *proc, insn_t insn)
 
 	mvreg(proc, rd, extend32to64((uint32_t)((int32_t)getreg(proc, rs1) /
 						(int32_t)getreg(proc, rs2))));
-	dbg_log("0x%lx: divw: %s (%ld) = %s (%ld) / %s (%ld)", proc->pc,
-		reg2abi(rd), getreg(proc, rd), reg2abi(rs1), getreg(proc, rs1),
-		reg2abi(rs2), getreg(proc, rs2));
 	return 0;
 }
 
@@ -226,9 +202,6 @@ int insn_divuw(struct proc *proc, insn_t insn)
 
 	mvreg(proc, rd, extend32to64((uint32_t)((uint32_t)getreg(proc, rs1) /
 						 (uint32_t)getreg(proc, rs2))));
-	dbg_log("0x%lx: divuw: %s (%ld) = %s (%ld) / %s (%ld)", proc->pc,
-		reg2abi(rd), getreg(proc, rd), reg2abi(rs1), getreg(proc, rs1),
-		reg2abi(rs2), getreg(proc, rs2));
 	return 0;
 }
 
@@ -253,9 +226,6 @@ int insn_rem(struct proc *proc, insn_t insn)
 	}
 
 	mvreg(proc, rd, (reg_t)((int64_t)getreg(proc, rs1) % (int64_t)getreg(proc, rs2)));
-	dbg_log("0x%lx: rem: %s (%ld) = %s (%ld) %% %s (%ld)", proc->pc,
-		reg2abi(rd), getreg(proc, rd), reg2abi(rs1), getreg(proc, rs1),
-		reg2abi(rs2), getreg(proc, rs2));
 	return 0;
 }
 
@@ -274,9 +244,6 @@ int insn_remu(struct proc *proc, insn_t insn)
 	}
 
 	mvreg(proc, rd, (reg_t)((uint64_t)getreg(proc, rs1) % (uint64_t)getreg(proc, rs2)));
-	dbg_log("0x%lx: remu: %s (%lu) = %s (%lu) %% %s (%lu)", proc->pc,
-		reg2abi(rd), getreg(proc, rd), reg2abi(rs1), getreg(proc, rs1),
-		reg2abi(rs2), getreg(proc, rs2));
 	return 0;
 }
 
@@ -302,9 +269,6 @@ int insn_remw(struct proc *proc, insn_t insn)
 
 	mvreg(proc, rd, extend32to64((uint32_t)((int32_t)getreg(proc, rs1) %
 						(int32_t)getreg(proc, rs2))));
-	dbg_log("0x%lx: remw: %s (%ld) = %s (%ld) %% %s (%ld)", proc->pc,
-		reg2abi(rd), getreg(proc, rd), reg2abi(rs1), getreg(proc, rs1),
-		reg2abi(rs2), getreg(proc, rs2));
 	return 0;
 }
 
@@ -324,9 +288,6 @@ int insn_remuw(struct proc *proc, insn_t insn)
 
 	mvreg(proc, rd, zextend32to64((uint32_t)((uint32_t)getreg(proc, rs1) %
 						 (uint32_t)getreg(proc, rs2))));
-	dbg_log("0x%lx: remuw: %s (%ld) = %s (%ld) %% %s (%ld)", proc->pc,
-		reg2abi(rd), getreg(proc, rd), reg2abi(rs1), getreg(proc, rs1),
-		reg2abi(rs2), getreg(proc, rs2));
 	return 0;
 }
 #endif // HAVE_RV64M

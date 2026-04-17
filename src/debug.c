@@ -12,7 +12,7 @@
 #include "debug.h"
 
 static FILE *logfile = NULL;
-static enum LOGLEVEL loglevel = DBG_LOGLEVEL;
+static enum LOGLEVEL loglevel = ERR_LOGLEVEL;
 
 void setdbgcfg(void)
 {
@@ -20,7 +20,7 @@ void setdbgcfg(void)
 
 	if (!get_globalcfg()) {
 		logfile = stderr;
-		loglevel = INFO_LOGLEVEL;
+		loglevel = ERR_LOGLEVEL;
 		return;
 	}
 

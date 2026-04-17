@@ -105,8 +105,8 @@ static void setcfg(int argc, char **argv)
 		.opt = {.has_arg = ARG_MANDATORY, .name = "log-level"},
 		.help = "\t--log-level=LEVEL: There are four types of logging messages:\n"
 			"\t                   debug (level 0), info (level 1), warn (level 2), and error (level 3)\n"
-			"\t                   only messages of level below or equal to LEVEL will be outputed, "
-			"LEVEL defaults to 1",
+			"\t                   only messages of level below or equal to LEVEL will be outputed\n"
+			"\t                   LEVEL defaults to 3",
 	},				{
 		.rvopt = {.type = CFG_HELP},
 		.opt = {.has_arg = NO_ARG, .name = "help"},
