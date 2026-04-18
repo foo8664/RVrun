@@ -16,6 +16,7 @@
 #include "insn.h"
 #include "config.h"
 #include "common.h"
+#include "rv_f.h"
 
 // Von Neumann fetch-decode-exec cycle, returns non-zero at error
 static int exec_cycle(struct proc *proc) ATTRIBUTE(nonnull, cold);
@@ -39,6 +40,8 @@ int main(int argc, char **argv, char **envp)
 		freeproc(proc);
 		panic("Could not load processes argv or envp");
 	}
+
+	riscv_float_setup(proc);
 
 	if (exec_cycle(proc))
 		panic("Interrupting fetch-decode-exec cycle");

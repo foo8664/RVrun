@@ -15,13 +15,14 @@ CFLAGS += -std=c11 -pedantic-errors -D_GNU_SOURCE
 CFLAGS += -I$(headers)
 CFLAGS += -O2 -mtune=native
 CFLAGS += -DRVRUN_VERSION_MAJOR=1 -DRVRUN_VERSION_MINOR=0
+LDFLAGS = -lm
 
 VPATH = $(src):$(headers)
 objs = main.o debug.o config.o memory.o proc.o syscall.o insn.o riscv.o rv_i.o \
-       rv_m.o
+       rv_m.o rv_f.o Zicsr.o
 
 rvrun: $(objs)
-	$(CC) $(CFLAGS) $(objs) -o rvrun
+	$(CC) $(LDFLAGS) $(CFLAGS) $(objs) -o rvrun
 
 # Copied and slightly modified from the GNU Make manual section 4.14
 %.d: %.c $(headers)/opcodes.h

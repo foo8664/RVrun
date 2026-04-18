@@ -25,9 +25,14 @@ struct fdinfo {
 
 // Process structure
 struct proc {
+	// Normal registers
 	reg_t regs[32]; // reg[N] is register xN
 	reg_t pc;
 
+	// CSR registers
+	uint32_t fcsr;
+
+	// Extra info
 	struct memory mem;
 	struct exitinfo exitinfo;
 	struct fdinfo fdinfo;

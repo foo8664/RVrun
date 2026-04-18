@@ -14,6 +14,8 @@
 
 #include "rv_i.h"
 #include "rv_m.h"
+#include "rv_f.h"
+#include "Zicsr.h"
 
 int insn_fetch(struct proc *proc, insn_t *insn)
 {
@@ -107,6 +109,14 @@ int (*insn_decode(insn_t insn))(struct proc *, insn_t)
 	ADD_INSN(REMU,	insn_remu);
 	ADD_INSN(REMW,	insn_remw);
 	ADD_INSN(REMUW,	insn_remuw);
+
+	// Zicsr Instructions
+	ADD_INSN(CSRRW, insn_csrrw);
+	ADD_INSN(CSRRS, insn_csrrs);
+	ADD_INSN(CSRRC, insn_csrrc);
+	ADD_INSN(CSRRWI,insn_csrrwi);
+	ADD_INSN(CSRRSI,insn_csrrsi);
+	ADD_INSN(CSRRCI,insn_csrrci);
 
 	errno = ENOSYS;
 	return NULL;

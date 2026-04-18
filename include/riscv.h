@@ -17,6 +17,7 @@ typedef uint64_t ureg_t;
 typedef int64_t ireg_t;
 typedef uint64_t rvaddr_t;
 typedef uint32_t insn_t;
+typedef uint16_t csr_t;
 
 enum ABI_REG {
 	REG_ZERO=0,
