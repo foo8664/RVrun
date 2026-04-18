@@ -39,7 +39,7 @@ int insn_fetch(struct proc *proc, insn_t *insn)
 #define ADD_INSN(name, fname) if (IS_INSN(insn, name)) return (fname)
 int (*insn_decode(insn_t insn))(struct proc *, insn_t)
 {
-#ifdef HAVE_RV64I // Rv64I Instructions:
+	// Rv64I Instructions:
 	ADD_INSN(ADD,	insn_add);
 	ADD_INSN(SLT,	insn_slt);
 	ADD_INSN(SLTU,	insn_sltu);
@@ -92,9 +92,8 @@ int (*insn_decode(insn_t insn))(struct proc *, insn_t)
 	ADD_INSN(ECALL, insn_ecall);
 	ADD_INSN(EBREAK,insn_ebreak);
 	ADD_INSN(FENCE, insn_fence);
-#endif
 
-#ifdef HAVE_RV64M // Rv64M Instructions
+	// Rv64M Instructions
 	ADD_INSN(MUL,	insn_mul);
 	ADD_INSN(MULW,	insn_mulw);
 	ADD_INSN(MULH,	insn_mulh);
@@ -108,7 +107,6 @@ int (*insn_decode(insn_t insn))(struct proc *, insn_t)
 	ADD_INSN(REMU,	insn_remu);
 	ADD_INSN(REMW,	insn_remw);
 	ADD_INSN(REMUW,	insn_remuw);
-#endif
 
 	errno = ENOSYS;
 	return NULL;

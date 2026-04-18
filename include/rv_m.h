@@ -11,9 +11,6 @@
 #include "riscv.h"
 #include "proc.h"
 
-#ifdef __x86_64__
-# define HAVE_RV64M
-
 #include "common.h"
 int insn_mul(struct proc *proc, insn_t insn)	ATTRIBUTE(nonnull);
 int insn_mulw(struct proc *proc, insn_t insn)	ATTRIBUTE(nonnull);
@@ -28,9 +25,5 @@ int insn_rem(struct proc *proc, insn_t insn)	ATTRIBUTE(nonnull);
 int insn_remu(struct proc *proc, insn_t insn)	ATTRIBUTE(nonnull);
 int insn_remw(struct proc *proc, insn_t insn)	ATTRIBUTE(nonnull);
 int insn_remuw(struct proc *proc, insn_t insn)	ATTRIBUTE(nonnull);
-
-#else
-# warning "The M extension is only currently supported for AMD64 (aka x86-64) machines"
-#endif
 
 #endif // RVRUN_RV64M_H

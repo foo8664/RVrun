@@ -11,8 +11,6 @@
 #include "riscv.h"
 #include "proc.h"
 
-#define HAVE_RV64I
-
 #include "common.h"
 
 /*

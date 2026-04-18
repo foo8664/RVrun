@@ -12,7 +12,6 @@
 #include "rv_m.h"
 
 
-#ifdef HAVE_RV64M
 static inline void getfields(insn_t insn, enum ABI_REG *rd, enum ABI_REG *rs1, enum ABI_REG *rs2)
 {
 	*rd = (enum ABI_REG)((insn & 0xf80) >> 7);
@@ -290,4 +289,3 @@ int insn_remuw(struct proc *proc, insn_t insn)
 						 (uint32_t)getreg(proc, rs2))));
 	return 0;
 }
-#endif // HAVE_RV64M
