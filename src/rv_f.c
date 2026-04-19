@@ -22,11 +22,11 @@
 #define CLEARBITS(bits, mask) ((bits) & ~(mask))
 
 // Returns 1 if dym, 0 if not (and then propagates)
-static int propagate_frm(uint8_t mode);
+static int propagate_frm(uint32_t fcsr);
 
-static int propagate_frm(uint8_t mode)
+static int propagate_frm(uint32_t fcsr)
 {
-	switch ((mode & 0xe0) >> 5) {
+	switch (GET_FRM(fcsr)) {
 	case RISCV_FRND_RNE:
 		if (fesetround(FE_TONEAREST) != 0)
 			panic("fsetround() failed");
@@ -58,7 +58,7 @@ void riscv_float_setup(struct proc *proc)
 	if (feclearexcept(FE_ALL_EXCEPT) != 0)
 		panic("fclearexcept() failed");
 	proc->fcsr = 0;
-	propagate_frm(GET_FRM(proc->fcsr));
+	propagate_frm(proc->fcsr);
 
 	// GCC complains about (apparently) unfixible sign conversions
 #pragma GCC diagnostic push
@@ -75,15 +75,15 @@ int fcsr_csrrw(struct proc *proc, enum ABI_REG rd, enum ABI_REG rs1, csr_t csr)
 {
 	switch (csr) {
 	case CSR_FCSR:
-		mvreg(proc, rd, extend32to64(proc->fcsr & 0xff));
+		mvreg(proc, rd, zextend32to64(proc->fcsr & 0xff));
 		proc->fcsr = (uint32_t)(getreg(proc, rs1) & 0xff);
-		return propagate_frm(GET_FRM(proc->fcsr));
+		return propagate_frm(proc->fcsr);
 	case CSR_FRM:
-		mvreg(proc, rd, extend8to64(GET_FRM(proc->fcsr)));
+		mvreg(proc, rd, zextend8to64(GET_FRM(proc->fcsr)));
 		WRITE_FRM(proc->fcsr, getreg(proc, rs1));
-		return propagate_frm(GET_FRM(proc->fcsr));
+		return propagate_frm(proc->fcsr);
 	case CSR_FFLAGS:
-		mvreg(proc, rd, extend8to64(GET_FFLAGS(proc->fcsr)));
+		mvreg(proc, rd, zextend8to64(GET_FFLAGS(proc->fcsr)));
 		WRITE_FFLAGS(proc->fcsr, getreg(proc, rs1));
 		return 0;
 	}
@@ -97,22 +97,22 @@ int fcsr_csrrs(struct proc *proc, enum ABI_REG rd, enum ABI_REG rs1, csr_t csr)
 {
 	switch (csr) {
 	case CSR_FCSR:
-		mvreg(proc, rd, extend32to64(proc->fcsr & 0xff));
+		mvreg(proc, rd, zextend32to64(proc->fcsr & 0xff));
 		if (rs1) {
 			proc->fcsr = SETBITS(proc->fcsr, (uint32_t)(getreg(proc, rs1) & 0xff));
-			return propagate_frm(GET_FRM(proc->fcsr));
+			return propagate_frm(proc->fcsr);
 		}
 		return 0;
 	case CSR_FRM:
-		mvreg(proc, rd, extend8to64(GET_FRM(proc->fcsr)));
+		mvreg(proc, rd, zextend8to64(GET_FRM(proc->fcsr)));
 		if (rs1) {
 			WRITE_FRM(proc->fcsr, SETBITS(GET_FRM(proc->fcsr),
 				  (uint32_t)getreg(proc, rs1)));
-			return propagate_frm(GET_FRM(proc->fcsr));
+			return propagate_frm(proc->fcsr);
 		}
 		return 0;
 	case CSR_FFLAGS:
-		mvreg(proc, rd, extend8to64(GET_FFLAGS(proc->fcsr)));
+		mvreg(proc, rd, zextend8to64(GET_FFLAGS(proc->fcsr)));
 		if (rs1) {
 			WRITE_FFLAGS(proc->fcsr, SETBITS(GET_FFLAGS(proc->fcsr),
 				     (uint32_t)getreg(proc, rs1)));
@@ -129,22 +129,22 @@ int fcsr_csrrc(struct proc *proc, enum ABI_REG rd, enum ABI_REG rs1, csr_t csr)
 {
 	switch (csr) {
 	case CSR_FCSR:
-		mvreg(proc, rd, extend32to64(proc->fcsr & 0xff));
+		mvreg(proc, rd, zextend32to64(proc->fcsr & 0xff));
 		if (rs1) {
 			proc->fcsr = CLEARBITS(proc->fcsr, (uint32_t)(getreg(proc, rs1) & 0xff));
-			return propagate_frm(GET_FRM(proc->fcsr));
+			return propagate_frm(proc->fcsr);
 		}
 		return 0;
 	case CSR_FRM:
-		mvreg(proc, rd, extend8to64(GET_FRM(proc->fcsr)));
+		mvreg(proc, rd, zextend8to64(GET_FRM(proc->fcsr)));
 		if (rs1) {
 			WRITE_FRM(proc->fcsr, CLEARBITS(GET_FRM(proc->fcsr),
 				  (uint32_t)getreg(proc, rs1)));
-			return propagate_frm(GET_FRM(proc->fcsr));
+			return propagate_frm(proc->fcsr);
 		}
 		return 0;
 	case CSR_FFLAGS:
-		mvreg(proc, rd, extend8to64(GET_FFLAGS(proc->fcsr)));
+		mvreg(proc, rd, zextend8to64(GET_FFLAGS(proc->fcsr)));
 		if (rs1) {
 			WRITE_FFLAGS(proc->fcsr, CLEARBITS(GET_FFLAGS(proc->fcsr),
 				     (uint32_t)getreg(proc, rs1)));
@@ -163,15 +163,15 @@ int fcsr_csrrwi(struct proc *proc, enum ABI_REG rd, enum ABI_REG rs1, csr_t csr)
 
 	switch (csr) {
 	case CSR_FCSR:
-		mvreg(proc, rd, extend32to64(proc->fcsr & 0xff));
+		mvreg(proc, rd, zextend32to64(proc->fcsr & 0xff));
 		proc->fcsr = imm;
-		return propagate_frm(GET_FRM(proc->fcsr));
+		return propagate_frm(proc->fcsr);
 	case CSR_FRM:
-		mvreg(proc, rd, extend8to64(GET_FRM(proc->fcsr)));
+		mvreg(proc, rd, zextend8to64(GET_FRM(proc->fcsr)));
 		WRITE_FRM(proc->fcsr, GET_FRM(imm));
-		return propagate_frm(GET_FRM(proc->fcsr));
+		return propagate_frm(proc->fcsr);
 	case CSR_FFLAGS:
-		mvreg(proc, rd, extend8to64(GET_FFLAGS(proc->fcsr)));
+		mvreg(proc, rd, zextend8to64(GET_FFLAGS(proc->fcsr)));
 		WRITE_FFLAGS(proc->fcsr, GET_FFLAGS(imm));
 		return 0;
 	}
@@ -187,21 +187,21 @@ int fcsr_csrrsi(struct proc *proc, enum ABI_REG rd, enum ABI_REG rs1, csr_t csr)
 
 	switch (csr) {
 	case CSR_FCSR:
-		mvreg(proc, rd, extend32to64(proc->fcsr & 0xff));
+		mvreg(proc, rd, zextend32to64(proc->fcsr & 0xff));
 		if (imm) {
 			proc->fcsr = SETBITS(proc->fcsr, imm);
-			return propagate_frm(GET_FRM(proc->fcsr));
+			return propagate_frm(proc->fcsr);
 		}
 		return 0;
 	case CSR_FRM:
-		mvreg(proc, rd, extend8to64(GET_FRM(proc->fcsr)));
+		mvreg(proc, rd, zextend8to64(GET_FRM(proc->fcsr)));
 		if (imm) {
 			WRITE_FRM(proc->fcsr, SETBITS(proc->fcsr, GET_FRM(imm)));
-			return propagate_frm(GET_FRM(proc->fcsr));
+			return propagate_frm(proc->fcsr);
 		}
 		return 0;
 	case CSR_FFLAGS:
-		mvreg(proc, rd, extend8to64(GET_FFLAGS(proc->fcsr)));
+		mvreg(proc, rd, zextend8to64(GET_FFLAGS(proc->fcsr)));
 		if (imm)
 			WRITE_FFLAGS(proc->fcsr, SETBITS(proc->fcsr, GET_FFLAGS(imm)));
 		return 0;
@@ -218,22 +218,22 @@ int fcsr_csrrci(struct proc *proc, enum ABI_REG rd, enum ABI_REG rs1, csr_t csr)
 
 	switch (csr) {
 	case CSR_FCSR:
-		mvreg(proc, rd, extend32to64(proc->fcsr & 0xff));
+		mvreg(proc, rd, zextend32to64(proc->fcsr & 0xff));
 		if (imm) {
 			proc->fcsr = CLEARBITS(proc->fcsr, imm);
-			return propagate_frm(GET_FRM(proc->fcsr));
+			return propagate_frm(proc->fcsr);
 		}
 		return 0;
 	case CSR_FRM:
-		mvreg(proc, rd, extend8to64(GET_FRM(proc->fcsr)));
+		mvreg(proc, rd, zextend8to64(GET_FRM(proc->fcsr)));
 		if (imm) {
 			WRITE_FRM(proc->fcsr, CLEARBITS(proc->fcsr,
 				  (uint32_t)GET_FRM(imm)));
-			return propagate_frm(GET_FRM(proc->fcsr));
+			return propagate_frm(proc->fcsr);
 		}
 		return 0;
 	case CSR_FFLAGS:
-		mvreg(proc, rd, extend8to64(GET_FFLAGS(proc->fcsr)));
+		mvreg(proc, rd, zextend8to64(GET_FFLAGS(proc->fcsr)));
 		if (imm)
 			WRITE_FFLAGS(proc->fcsr, CLEARBITS(proc->fcsr,
 				     (uint32_t)GET_FFLAGS(imm)));
