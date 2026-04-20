@@ -520,6 +520,7 @@ int insn_fsqrt_s(struct proc *proc, insn_t insn)
 	if (isnan(res))
 		res = canonical_nan();
 
+	mvfreg(proc, rd, res);
 	return 0;
 }
 
