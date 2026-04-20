@@ -31,6 +31,7 @@
 #define WRITE_FRM(fcsr, val) ((fcsr) |= (uint32_t)((val) & 0xe0))
 #define WRITE_FFLAGS(fcsr, val) ((fcsr) |= (uint32_t)((val) & 0x1f))
 
+
 int fcsr_csrrw(struct proc *proc, enum ABI_REG rd, enum ABI_REG rs1, csr_t csr)
 	ATTRIBUTE(nonnull);
 int fcsr_csrrs(struct proc *proc, enum ABI_REG rd, enum ABI_REG rs1, csr_t csr)
@@ -50,5 +51,12 @@ void riscv_float_setup(struct proc *proc) ATTRIBUTE(nonnull);
 // Floating point instructions
 int insn_flw(struct proc *proc, insn_t insn) ATTRIBUTE(nonnull);
 int insn_fsw(struct proc *proc, insn_t insn) ATTRIBUTE(nonnull);
+int insn_fadd_s(struct proc *proc, insn_t insn) ATTRIBUTE(nonnull);
+int insn_fsub_s(struct proc *proc, insn_t insn) ATTRIBUTE(nonnull);
+int insn_fmul_s(struct proc *proc, insn_t insn) ATTRIBUTE(nonnull);
+int insn_fdiv_s(struct proc *proc, insn_t insn) ATTRIBUTE(nonnull);
+int insn_fsqrt_s(struct proc *proc, insn_t insn) ATTRIBUTE(nonnull);
+int insn_fmin_s(struct proc *proc, insn_t insn) ATTRIBUTE(nonnull);
+int insn_fmax_s(struct proc *proc, insn_t insn) ATTRIBUTE(nonnull);
 
 #endif // RVRUN_RV_F_H

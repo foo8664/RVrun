@@ -16,6 +16,10 @@
 // Array size
 #define ARRAY_SIZE(arr) (sizeof(arr) / (sizeof(*(arr))))
 
+// max-min
+#define min(a, b) ((a) <= (b) ? (a) : (b))
+#define max(a, b) ((a) >= (b) ? (a) : (b))
+
 // Branch prediction optimizations
 #ifdef __GNUC__
 # define LIKELY(x)	(__builtin_expect(!!(x), 1))
