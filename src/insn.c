@@ -118,6 +118,10 @@ int (*insn_decode(insn_t insn))(struct proc *, insn_t)
 	ADD_INSN(CSRRSI,insn_csrrsi);
 	ADD_INSN(CSRRCI,insn_csrrci);
 
+	// F Instructions
+	ADD_INSN(FLW,	insn_flw);
+	ADD_INSN(FSW,	insn_fsw);
+
 	errno = ENOSYS;
 	return NULL;
 }

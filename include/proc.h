@@ -26,8 +26,9 @@ struct fdinfo {
 // Process structure
 struct proc {
 	// Normal registers
-	reg_t regs[32]; // reg[N] is register xN
 	reg_t pc;
+	reg_t regs[32];
+	freg_t fregs[32];
 
 	// CSR registers
 	uint32_t fcsr;
@@ -50,8 +51,14 @@ struct proc *loadproc(const char *path) ATTRIBUTE(nonnull, cold, malloc(freeproc
 int load_argv_and_envp(struct proc *proc, char **argv, char **envp) ATTRIBUTE(nonnull, cold);
 
 // set and get a process's registers
-static inline void mvreg(struct proc *proc, enum ABI_REG reg, reg_t val) ATTRIBUTE(nonnull);
-static inline reg_t getreg(const struct proc *proc, enum ABI_REG reg) ATTRIBUTE(nonnull);
+static inline void mvreg(struct proc *proc, enum ABI_REG reg, reg_t val)
+	ATTRIBUTE(nonnull);
+static inline void mvfreg(struct proc *proc, enum ABI_FREG reg, freg_t val)
+	ATTRIBUTE(nonnull);
+static inline reg_t getreg(const struct proc *proc, enum ABI_REG reg)
+	ATTRIBUTE(nonnull);
+static inline freg_t getfreg(const struct proc *proc, enum ABI_FREG reg)
+	ATTRIBUTE(nonnull);
 
 #include <assert.h>
 static inline void mvreg(struct proc *proc, enum ABI_REG reg, reg_t val)
@@ -64,6 +71,18 @@ static inline reg_t getreg(const struct proc *proc, enum ABI_REG reg)
 {
 	assert(reg >= 0 && reg < 32);
 	return (reg ? proc->regs[reg] : 0);
+}
+
+static inline void mvfreg(struct proc *proc, enum ABI_FREG reg, freg_t val)
+{
+	assert(reg >= 0 && reg < 32);
+	proc->fregs[reg] = val;
+}
+
+static inline freg_t getfreg(const struct proc *proc, enum ABI_FREG reg)
+{
+	assert(reg >= 0 && reg < 32);
+	return proc->fregs[reg];
 }
 
 #endif /* LOADER_H */

@@ -34,7 +34,7 @@ rvrun: $(objs)
 
 .PHONY: clean install uninstall
 clean:
-	-rm -f *.o *.d 2>/dev/null || true
+	-rm -f *.o *.d* 2>/dev/null || true
 
 install:
 	install -m755 rvrun $(PREFIX)/bin/rvrun
