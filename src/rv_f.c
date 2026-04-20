@@ -33,6 +33,7 @@ static void propagate_fflags(uint32_t *fcsr);
 // Gets width/rm field in an instruction
 static inline uint8_t insn2rm(insn_t insn) ATTRIBUTE(const);
 
+static inline uint8_t insn2rs3(insn_t insn) ATTRIBUTE(const);
 // Canonical NaN for single precision
 static inline float canonical_nan(void) ATTRIBUTE(const);
 
@@ -99,6 +100,11 @@ static inline bool eq_minus_zero(float f)
 
 	_Static_assert(sizeof(minus_zero) == sizeof(f), "sizeof float is not 4");
 	return memcmp(&f, &minus_zero, sizeof(minus_zero)) == 0;
+}
+
+static inline uint8_t insn2rs3(insn_t insn)
+{
+	return (uint8_t)((insn & 0xf8000000) >> 27);
 }
 
 // Must be ran before any floating point operations
@@ -585,6 +591,178 @@ int insn_fmax_s(struct proc *proc, insn_t insn)
 		res = getfreg(proc, rs2);
 	} else {
 		res = max(getfreg(proc, rs1), getfreg(proc, rs2));
+	}
+
+	if (isnan(res))
+		res = canonical_nan();
+
+	mvfreg(proc, rd, res);
+	return 0;
+}
+
+int insn_fmadd_s(struct proc *proc, insn_t insn)
+{
+	uint8_t rd;
+	uint8_t rs1;
+	uint8_t rs2;
+	uint8_t rs3;
+	uint8_t rm;
+	float res;
+
+	rd = insn2rd(insn);
+	rs1 = insn2rs1(insn);
+	rs2 = insn2rs2(insn);
+	rs3 = insn2rs3(insn);
+	rm = insn2rm(insn);
+
+	feclearexcept(FE_ALL_EXCEPT);
+	if ((isinf(getfreg(proc, rs1)) && getfreg(proc, rs2) == 0) ||
+	    (isinf(getfreg(proc, rs2)) && getfreg(proc, rs1) == 0)) {
+		WRITE_FFLAGS(proc->fcsr, SETBITS(proc->fcsr, RISCV_FEXCEPT_NV));
+	}
+
+	if (rm == RISCV_FRND_RMM ||
+	   (rm == RISCV_FRND_DYN && GET_FRM(proc->fcsr) == RISCV_FRND_RMM)) {
+		res = getfreg(proc, rs1) * getfreg(proc, rs2) + getfreg(proc, rs3);
+		propagate_fflags(&proc->fcsr);
+		res = roundf(res);
+	} else if (rm == RISCV_FRND_DYN) {
+		res = getfreg(proc, rs1) * getfreg(proc, rs2) + getfreg(proc, rs3);
+		propagate_fflags(&proc->fcsr);
+	} else {
+		propagate_frm((uint32_t)rm  << 5);
+		res = getfreg(proc, rs1) * getfreg(proc, rs2) + getfreg(proc, rs3);
+		propagate_fflags(&proc->fcsr);
+		propagate_frm(proc->fcsr);
+	}
+
+	if (isnan(res))
+		res = canonical_nan();
+
+	mvfreg(proc, rd, res);
+	return 0;
+}
+
+int insn_fmsub_s(struct proc *proc, insn_t insn)
+{
+	uint8_t rd;
+	uint8_t rs1;
+	uint8_t rs2;
+	uint8_t rs3;
+	uint8_t rm;
+	float res;
+
+	rd = insn2rd(insn);
+	rs1 = insn2rs1(insn);
+	rs2 = insn2rs2(insn);
+	rs3 = insn2rs3(insn);
+	rm = insn2rm(insn);
+
+	feclearexcept(FE_ALL_EXCEPT);
+	if ((isinf(getfreg(proc, rs1)) && getfreg(proc, rs2) == 0) ||
+	    (isinf(getfreg(proc, rs2)) && getfreg(proc, rs1) == 0)) {
+		WRITE_FFLAGS(proc->fcsr, SETBITS(proc->fcsr, RISCV_FEXCEPT_NV));
+	}
+
+	if (rm == RISCV_FRND_RMM ||
+	   (rm == RISCV_FRND_DYN && GET_FRM(proc->fcsr) == RISCV_FRND_RMM)) {
+		res = getfreg(proc, rs1) * getfreg(proc, rs2) - getfreg(proc, rs3);
+		propagate_fflags(&proc->fcsr);
+		res = roundf(res);
+	} else if (rm == RISCV_FRND_DYN) {
+		res = getfreg(proc, rs1) * getfreg(proc, rs2) - getfreg(proc, rs3);
+		propagate_fflags(&proc->fcsr);
+	} else {
+		propagate_frm((uint32_t)rm  << 5);
+		res = getfreg(proc, rs1) * getfreg(proc, rs2) - getfreg(proc, rs3);
+		propagate_fflags(&proc->fcsr);
+		propagate_frm(proc->fcsr);
+	}
+
+	if (isnan(res))
+		res = canonical_nan();
+
+	mvfreg(proc, rd, res);
+	return 0;
+}
+
+int insn_fnmadd_s(struct proc *proc, insn_t insn)
+{
+	uint8_t rd;
+	uint8_t rs1;
+	uint8_t rs2;
+	uint8_t rs3;
+	uint8_t rm;
+	float res;
+
+	rd = insn2rd(insn);
+	rs1 = insn2rs1(insn);
+	rs2 = insn2rs2(insn);
+	rs3 = insn2rs3(insn);
+	rm = insn2rm(insn);
+
+	feclearexcept(FE_ALL_EXCEPT);
+	if ((isinf(getfreg(proc, rs1)) && getfreg(proc, rs2) == 0) ||
+	    (isinf(getfreg(proc, rs2)) && getfreg(proc, rs1) == 0)) {
+		WRITE_FFLAGS(proc->fcsr, SETBITS(proc->fcsr, RISCV_FEXCEPT_NV));
+	}
+
+	if (rm == RISCV_FRND_RMM ||
+	   (rm == RISCV_FRND_DYN && GET_FRM(proc->fcsr) == RISCV_FRND_RMM)) {
+		res = -(getfreg(proc, rs1) * getfreg(proc, rs2)) + getfreg(proc, rs3);
+		propagate_fflags(&proc->fcsr);
+		res = roundf(res);
+	} else if (rm == RISCV_FRND_DYN) {
+		res = -(getfreg(proc, rs1) * getfreg(proc, rs2)) + getfreg(proc, rs3);
+		propagate_fflags(&proc->fcsr);
+	} else {
+		propagate_frm((uint32_t)rm  << 5);
+		res = -(getfreg(proc, rs1) * getfreg(proc, rs2)) + getfreg(proc, rs3);
+		propagate_fflags(&proc->fcsr);
+		propagate_frm(proc->fcsr);
+	}
+
+	if (isnan(res))
+		res = canonical_nan();
+
+	mvfreg(proc, rd, res);
+	return 0;
+}
+
+int insn_fnmsub_s(struct proc *proc, insn_t insn)
+{
+	uint8_t rd;
+	uint8_t rs1;
+	uint8_t rs2;
+	uint8_t rs3;
+	uint8_t rm;
+	float res;
+
+	rd = insn2rd(insn);
+	rs1 = insn2rs1(insn);
+	rs2 = insn2rs2(insn);
+	rs3 = insn2rs3(insn);
+	rm = insn2rm(insn);
+
+	feclearexcept(FE_ALL_EXCEPT);
+	if ((isinf(getfreg(proc, rs1)) && getfreg(proc, rs2) == 0) ||
+	    (isinf(getfreg(proc, rs2)) && getfreg(proc, rs1) == 0)) {
+		WRITE_FFLAGS(proc->fcsr, SETBITS(proc->fcsr, RISCV_FEXCEPT_NV));
+	}
+
+	if (rm == RISCV_FRND_RMM ||
+	   (rm == RISCV_FRND_DYN && GET_FRM(proc->fcsr) == RISCV_FRND_RMM)) {
+		res = -(getfreg(proc, rs1) * getfreg(proc, rs2)) - getfreg(proc, rs3);
+		propagate_fflags(&proc->fcsr);
+		res = roundf(res);
+	} else if (rm == RISCV_FRND_DYN) {
+		res = -(getfreg(proc, rs1) * getfreg(proc, rs2)) - getfreg(proc, rs3);
+		propagate_fflags(&proc->fcsr);
+	} else {
+		propagate_frm((uint32_t)rm  << 5);
+		res = -(getfreg(proc, rs1) * getfreg(proc, rs2)) - getfreg(proc, rs3);
+		propagate_fflags(&proc->fcsr);
+		propagate_frm(proc->fcsr);
 	}
 
 	if (isnan(res))

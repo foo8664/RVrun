@@ -58,5 +58,9 @@ int insn_fdiv_s(struct proc *proc, insn_t insn) ATTRIBUTE(nonnull);
 int insn_fsqrt_s(struct proc *proc, insn_t insn) ATTRIBUTE(nonnull);
 int insn_fmin_s(struct proc *proc, insn_t insn) ATTRIBUTE(nonnull);
 int insn_fmax_s(struct proc *proc, insn_t insn) ATTRIBUTE(nonnull);
+int insn_fmadd_s(struct proc *proc, insn_t insn) ATTRIBUTE(nonnull);
+int insn_fmsub_s(struct proc *proc, insn_t insn) ATTRIBUTE(nonnull);
+int insn_fnmadd_s(struct proc *proc, insn_t insn) ATTRIBUTE(nonnull);
+int insn_fnmsub_s(struct proc *proc, insn_t insn) ATTRIBUTE(nonnull);
 
 #endif // RVRUN_RV_F_H

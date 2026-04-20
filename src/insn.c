@@ -128,6 +128,10 @@ int (*insn_decode(insn_t insn))(struct proc *, insn_t)
 	ADD_INSN(FSQRT_S,insn_fsqrt_s);
 	ADD_INSN(FMIN_S,insn_fmin_s);
 	ADD_INSN(FMAX_S,insn_fmax_s);
+	ADD_INSN(FMADD_S,insn_fmadd_s);
+	ADD_INSN(FMSUB_S,insn_fmsub_s);
+	ADD_INSN(FNMADD_S,insn_fnmadd_s);
+	ADD_INSN(FNMSUB_S,insn_fnmsub_s);
 
 	errno = ENOSYS;
 	return NULL;
