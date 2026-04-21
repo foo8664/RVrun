@@ -132,6 +132,14 @@ int (*insn_decode(insn_t insn))(struct proc *, insn_t)
 	ADD_INSN(FMSUB_S,insn_fmsub_s);
 	ADD_INSN(FNMADD_S,insn_fnmadd_s);
 	ADD_INSN(FNMSUB_S,insn_fnmsub_s);
+	ADD_INSN(FCVT_S_W,insn_fcvt_s_w);
+	ADD_INSN(FCVT_S_L,insn_fcvt_s_l);
+	ADD_INSN(FCVT_S_WU,insn_fcvt_s_wu);
+	ADD_INSN(FCVT_S_LU,insn_fcvt_s_lu);
+	ADD_INSN(FCVT_W_S,insn_fcvt_w_s);
+	ADD_INSN(FCVT_L_S,insn_fcvt_l_s);
+	ADD_INSN(FCVT_WU_S,insn_fcvt_wu_s);
+	ADD_INSN(FCVT_LU_S,insn_fcvt_lu_s);
 
 	errno = ENOSYS;
 	return NULL;
