@@ -38,8 +38,9 @@ static inline uint8_t insn2rs3(insn_t insn) ATTRIBUTE(const);
 // Canonical NaN for single precision
 static inline float canonical_nan(void) ATTRIBUTE(const);
 
-// Equals -0.0 for single precision
+// Equals -0.0 or +0.0 for single precision
 static inline bool eq_minus_zero(float f) ATTRIBUTE(const);
+static inline bool eq_positive_zero(float f) ATTRIBUTE(const);
 
 static int propagate_frm(uint32_t fcsr)
 {
@@ -101,6 +102,14 @@ static inline bool eq_minus_zero(float f)
 
 	_Static_assert(sizeof(minus_zero) == sizeof(f), "sizeof float is not 4");
 	return memcmp(&f, &minus_zero, sizeof(minus_zero)) == 0;
+}
+
+static inline bool eq_positive_zero(float f)
+{
+	uint32_t positive_zero = 0x0;
+
+	_Static_assert(sizeof(positive_zero) == sizeof(f), "sizeof float is not 4");
+	return memcmp(&f, &positive_zero, sizeof(positive_zero)) == 0;
 }
 
 static inline uint8_t insn2rs3(insn_t insn)
@@ -1242,5 +1251,31 @@ int insn_fle_s(struct proc *proc, insn_t insn)
 	rs2 = insn2rs2(insn);
 
 	mvreg(proc, rd, getfreg(proc, rs1) <= getfreg(proc, rs2));
+	return 0;
+}
+
+int insn_fclass_s(struct proc *proc, insn_t insn)
+{
+	uint8_t rd;
+	uint8_t rs1;
+	uint16_t mask = 0;
+	int fpclass;
+
+	rd = insn2rd(insn);
+	rs1 = insn2rs1(insn);
+
+	fpclass = fpclassify(getfreg(proc, rs1));
+	mask |= ((fpclass & FP_INFINITE) && getfreg(proc, rs1) > 0)	? (1 << 0) : 0;
+	mask |= ((fpclass & FP_NORMAL) && getfreg(proc, rs1) < 0)	? (1 << 1) : 0;
+	mask |= ((fpclass & FP_SUBNORMAL) && getfreg(proc, rs1) < 0)	? (1 << 2) : 0;
+	mask |= (eq_minus_zero(getfreg(proc, rs1)))			? (1 << 3) : 0;
+	mask |= (eq_positive_zero(getfreg(proc, rs1)))			? (1 << 4) : 0;
+	mask |= ((fpclass & FP_SUBNORMAL) && getfreg(proc, rs1) > 0)	? (1 << 5) : 0;
+	mask |= ((fpclass & FP_NORMAL) && getfreg(proc, rs1) > 0)	? (1 << 6) : 0;
+	mask |= ((fpclass & FP_INFINITE) && getfreg(proc, rs1) > 0)	? (1 << 7) : 0;
+	mask |= ((fpclass & FP_NAN) && !issignaling(getfreg(proc, rs1)))? (1 << 8) : 0;
+	mask |= ((fpclass & FP_NAN) && issignaling(getfreg(proc, rs1)))	? (1 << 9) : 0;
+
+	mvreg(proc, rd, zextend16to64(mask));
 	return 0;
 }

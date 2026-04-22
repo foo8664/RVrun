@@ -148,6 +148,7 @@ int (*insn_decode(insn_t insn))(struct proc *, insn_t)
 	ADD_INSN(FEQ_S,	insn_feq_s);
 	ADD_INSN(FLT_S,	insn_flt_s);
 	ADD_INSN(FLE_S,	insn_fle_s);
+	ADD_INSN(FCLASS_S,insn_fclass_s);
 
 	errno = ENOSYS;
 	return NULL;

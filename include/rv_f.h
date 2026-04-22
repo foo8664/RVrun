@@ -78,5 +78,6 @@ int insn_fmv_w_x(struct proc *proc, insn_t insn) ATTRIBUTE(nonnull);
 int insn_feq_s(struct proc *proc, insn_t insn) ATTRIBUTE(nonnull);
 int insn_flt_s(struct proc *proc, insn_t insn) ATTRIBUTE(nonnull);
 int insn_fle_s(struct proc *proc, insn_t insn) ATTRIBUTE(nonnull);
+int insn_fclass_s(struct proc *proc, insn_t insn) ATTRIBUTE(nonnull);
 
 #endif // RVRUN_RV_F_H
