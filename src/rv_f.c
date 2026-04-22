@@ -1088,3 +1088,81 @@ int insn_fcvt_s_lu(struct proc *proc, insn_t insn)
 	mvfreg(proc, rd, res);
 	return 0;
 }
+
+int insn_fsgnj_s(struct proc *proc, insn_t insn)
+{
+	uint8_t rd;
+	uint8_t rs1;
+	uint8_t rs2;
+	uint32_t val1;
+	uint32_t val2;
+	float fval;
+
+	rd = insn2rd(insn);
+	rs1 = insn2rs1(insn);
+	rs2 = insn2rs2(insn);
+
+	_Static_assert(sizeof(val1) == sizeof(fval), "sizeof float is not 4");
+	fval = getfreg(proc, rs1);
+	memcpy(&val1, &fval, sizeof(val1));
+	fval = getfreg(proc, rs2);
+	memcpy(&val2, &fval, sizeof(val2));
+
+	val2 = (val2 & 0x80000000) | (val1 & 0x7fffffff);
+	memcpy(&fval, &val2, sizeof(val2));
+	mvfreg(proc, rd, fval);
+
+	return 0;
+}
+
+int insn_fsgnjn_s(struct proc *proc, insn_t insn)
+{
+	uint8_t rd;
+	uint8_t rs1;
+	uint8_t rs2;
+	uint32_t val1;
+	uint32_t val2;
+	float fval;
+
+	rd = insn2rd(insn);
+	rs1 = insn2rs1(insn);
+	rs2 = insn2rs2(insn);
+
+	_Static_assert(sizeof(val1) == sizeof(fval), "sizeof float is not 4");
+	fval = getfreg(proc, rs1);
+	memcpy(&val1, &fval, sizeof(val1));
+	fval = getfreg(proc, rs2);
+	memcpy(&val2, &fval, sizeof(val2));
+
+	val2 = (~val2 & 0x80000000) | (val1 & 0x7fffffff);
+	memcpy(&fval, &val2, sizeof(val2));
+	mvfreg(proc, rd, fval);
+
+	return 0;
+}
+
+int insn_fsgnjx_s(struct proc *proc, insn_t insn)
+{
+	uint8_t rd;
+	uint8_t rs1;
+	uint8_t rs2;
+	uint32_t val1;
+	uint32_t val2;
+	float fval;
+
+	rd = insn2rd(insn);
+	rs1 = insn2rs1(insn);
+	rs2 = insn2rs2(insn);
+
+	_Static_assert(sizeof(val1) == sizeof(fval), "sizeof float is not 4");
+	fval = getfreg(proc, rs1);
+	memcpy(&val1, &fval, sizeof(val1));
+	fval = getfreg(proc, rs2);
+	memcpy(&val2, &fval, sizeof(val2));
+
+	val2 = ((val2 ^ val1) & 0x80000000) | (val1 & 0x7fffffff);
+	memcpy(&fval, &val2, sizeof(val2));
+	mvfreg(proc, rd, fval);
+
+	return 0;
+}

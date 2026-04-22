@@ -70,5 +70,8 @@ int insn_fcvt_s_w(struct proc *proc, insn_t insn) ATTRIBUTE(nonnull);
 int insn_fcvt_s_wu(struct proc *proc, insn_t insn) ATTRIBUTE(nonnull);
 int insn_fcvt_s_l(struct proc *proc, insn_t insn) ATTRIBUTE(nonnull);
 int insn_fcvt_s_lu(struct proc *proc, insn_t insn) ATTRIBUTE(nonnull);
+int insn_fsgnj_s(struct proc *proc, insn_t insn) ATTRIBUTE(nonnull);
+int insn_fsgnjn_s(struct proc *proc, insn_t insn) ATTRIBUTE(nonnull);
+int insn_fsgnjx_s(struct proc *proc, insn_t insn) ATTRIBUTE(nonnull);
 
 #endif // RVRUN_RV_F_H
