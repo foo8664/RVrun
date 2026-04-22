@@ -152,7 +152,7 @@ static inline uint8_t insn2rs1(insn_t insn)
 
 static inline uint8_t insn2rs2(insn_t insn)
 {
-	return (uint8_t)((insn & 0xf00000) >> 20);
+	return (uint8_t)((insn & 0x1f00000) >> 20);
 }
 
 #endif // RISCV_H
