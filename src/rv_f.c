@@ -1202,3 +1202,45 @@ int insn_fmv_w_x(struct proc *proc, insn_t insn)
 
 	return 0;
 }
+
+int insn_feq_s(struct proc *proc, insn_t insn)
+{
+	uint8_t rd;
+	uint8_t rs1;
+	uint8_t rs2;
+
+	rd = insn2rd(insn);
+	rs1 = insn2rs1(insn);
+	rs2 = insn2rs2(insn);
+
+	mvreg(proc, rd, getfreg(proc, rs1) == getfreg(proc, rs2));
+	return 0;
+}
+
+int insn_flt_s(struct proc *proc, insn_t insn)
+{
+	uint8_t rd;
+	uint8_t rs1;
+	uint8_t rs2;
+
+	rd = insn2rd(insn);
+	rs1 = insn2rs1(insn);
+	rs2 = insn2rs2(insn);
+
+	mvreg(proc, rd, getfreg(proc, rs1) < getfreg(proc, rs2));
+	return 0;
+}
+
+int insn_fle_s(struct proc *proc, insn_t insn)
+{
+	uint8_t rd;
+	uint8_t rs1;
+	uint8_t rs2;
+
+	rd = insn2rd(insn);
+	rs1 = insn2rs1(insn);
+	rs2 = insn2rs2(insn);
+
+	mvreg(proc, rd, getfreg(proc, rs1) <= getfreg(proc, rs2));
+	return 0;
+}
