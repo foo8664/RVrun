@@ -805,13 +805,19 @@ int insn_fence(struct proc *proc, insn_t insn)
 
 int insn_ebreak(struct proc *proc, insn_t insn)
 {
-	enum ABI_REG i;
-
+	uint8_t i;
 	(void)insn;
 
 	dbg_log("EBREAK: Dumping proc's registers:");
 	for (i = 1; i < 32; ++i) {
 		printf("%s = 0x%lx\t\t\t", reg2abi(i), (unsigned long)getreg(proc, i));
+		if ((i & 1) == 0)
+			putchar('\n');
+	}
+
+	putchar('\n');
+	for (i = 0; i < 32; ++i) {
+		printf("%s = %f\t\t\t", freg2abi(i), getfreg(proc, i));
 		if ((i & 1) == 0)
 			putchar('\n');
 	}
