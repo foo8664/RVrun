@@ -1166,3 +1166,39 @@ int insn_fsgnjx_s(struct proc *proc, insn_t insn)
 
 	return 0;
 }
+
+int insn_fmv_x_w(struct proc *proc, insn_t insn)
+{
+	uint8_t rd;
+	uint8_t rs1;
+	uint32_t val;
+	float fval;
+
+	rd = insn2rd(insn);
+	rs1 = insn2rs1(insn);
+
+	_Static_assert(sizeof(val) == sizeof(fval), "sizeof float is not 4");
+	fval = getfreg(proc, rs1);
+	memcpy(&val, &fval, sizeof(val));
+	mvreg(proc, rd, extend32to64(val));
+
+	return 0;
+}
+
+int insn_fmv_w_x(struct proc *proc, insn_t insn)
+{
+	uint8_t rd;
+	uint8_t rs1;
+	uint32_t val;
+	float fval;
+
+	rd = insn2rd(insn);
+	rs1 = insn2rs1(insn);
+
+	_Static_assert(sizeof(val) == sizeof(fval), "sizeof float is not 4");
+	val = (uint32_t)(getreg(proc, rs1) & 0xffffffff);
+	memcpy(&fval, &val, sizeof(fval));
+	mvfreg(proc, rd, fval);
+
+	return 0;
+}
