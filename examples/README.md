@@ -1,24 +1,21 @@
 # Example programs
 
-> These programs are meant to be used as examples for the emulator. The .elf files
-> are purposefully left so that one does not need a cross compiler just to test it.
+## Compiling
 
-The programs are simpler recreations of classical UNIX utilities.
+You will need a cross compiler for the RISC-V GNU toolchain for this, pre-compiled
+versions should be available on releases, tho.
 
+To compile these programs, run one of the following commands:
 
-## Compiling them
-
-While there is no need to compile them in your machine (the binaries are already there),
-you can do so by running:
 ```bash
 $ make all
 ```
 To compile all programs
 
 ```bash
-$ make $FILE.elf
+$ make <program>.elf
 ```
-To compile the $FILE program
+To compile the <program> program
 
 ```bash
 $ make clean
@@ -27,11 +24,14 @@ To delete all of the object files and binaries
 
 
 ## Current examples
- * echo
- * cat
- * xxd
- * fib (input a number n, prints the n-th number in the fibonacci sequence)
- * gcd (input two numbers, prints the greatest common divisor between them)
+floating point inputs MUST have a decimal part (e.g. 1 should be written as 1.0)
+ * echo (takes an indefinite amount of arguments, outputs them separated by a space)
+ * cat  (takes a filename as an argument, outputs it's contents)
+ * xxd  (takes a filename as an argument, outputs it's contents in hexadecimal)
+ * fib  (takes a natural number n as input, outputs the n-th fibonacci number)
+ * gcd  (takes two natural numbers as input, outputs their greatest common divisor)
+ * sin  (takes a floating point input in radians, outputs it's sine)
 
-These programs should be available at any modern linux system, with man pages!
-The current examples cannot take any flags to modify behaviour, but they do take arguments
+Some of these programs are recreations of famous UNIX utilities (echo, cat, and xxd).
+They do not take any flags, but Linux/UNIX system's man pages might be useful in providing
+a greater description of their expected behaviour
