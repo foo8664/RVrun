@@ -2,4 +2,5 @@ test.*
 *.o
 *.d
 examples/*.o
+examples/*.elf
 rvrun

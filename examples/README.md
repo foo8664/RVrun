@@ -30,7 +30,7 @@ floating point inputs MUST have a decimal part (e.g. 1 should be written as 1.0)
  * xxd  (takes a filename as an argument, outputs it's contents in hexadecimal)
  * fib  (takes a natural number n as input, outputs the n-th fibonacci number)
  * gcd  (takes two natural numbers as input, outputs their greatest common divisor)
- * sin  (takes a floating point input in radians, outputs it's sine)
+ * sin  (takes a floating point input between 3.14 and -3.14, outputs it's sine).
 
 Some of these programs are recreations of famous UNIX utilities (echo, cat, and xxd).
 They do not take any flags, but Linux/UNIX system's man pages might be useful in providing

@@ -34,7 +34,7 @@ main:
 	fneg.s fs2, fs2
 	addi s0, s0, 2
 
-	li t0, 15
+	li t0, 13
 	blt s0, t0, .sin_loop
 
 	la a0, msg_p1
