@@ -14,7 +14,7 @@ CFLAGS = -Wall -Werror -Wextra -Wconversion
 CFLAGS += -std=c11 -pedantic-errors -D_GNU_SOURCE
 CFLAGS += -I$(headers)
 CFLAGS += -O2 -mtune=native
-CFLAGS += -DRVRUN_VERSION_MAJOR=1 -DRVRUN_VERSION_MINOR=0
+CFLAGS += -DRVRUN_VERSION_MAJOR=1 -DRVRUN_VERSION_MINOR=1
 LDFLAGS = -lm
 
 VPATH = $(src):$(headers)
